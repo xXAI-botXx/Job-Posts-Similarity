@@ -1,10 +1,7 @@
 EXPERIMENT WITH ALL SAMPLES (actual 9118) DIFFERENCE BETWEEN MENTIONED ALGORYTHM ========================================================================================================================================================
 ALGORITHM: OPTICS
 
-
 FOUND CLUSTER = 289
-
-
 
 Cluster: 0
 Words: ['accounting', 'accounting finance', 'finance']
@@ -584,6 +581,14 @@ Cluster: 244
 Words: ['tv', 'tv data', 'tv data scientist']
 Cluster: 265
 Words: ['vp', 'vp data', 'vp data scientist']
+
+
+
+
+
+
+
+
 =======================================================================================================================================================================================================================
 
 ALGORITHM: SCIKIT LEARN EUCLIDIAN DISTANCE
@@ -1166,6 +1171,13 @@ Cluster: 108
 Words: ['tv', 'tv data', 'tv data scientist']
 Cluster: 205
 Words: ['vp', 'vp data', 'vp data scientist']
+
+
+
+
+
+
+
 
 =======================================================================================================================================================================================================================
 ALGORITHM: NLTK KMEANS (COSINE DISTANTS)
