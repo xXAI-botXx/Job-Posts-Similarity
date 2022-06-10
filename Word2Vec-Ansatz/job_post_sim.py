@@ -550,9 +550,9 @@ def main():
     cur_idx = 0
     print("-----\nNavigate with 'next', 'prev', 'exit'\n-----")
     while True:
-        print_job_post(posts.iloc[cur_idx, :], True)
+        print_job_post(posts.iloc[cur_idx, :], False)
         user_input = input("User:")
-        if user_input == "next":
+        if user_input == "next" or user_input == "":
             if cur_idx < posts.shape[0]-1:
                 cur_idx += 1
         elif user_input == "prev":
