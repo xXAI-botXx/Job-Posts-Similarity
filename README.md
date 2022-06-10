@@ -789,7 +789,7 @@ def job_description_sum_similarity(post1, post2):
 sim_matrix = create_similarity_matrix(job_description_sum_similarity, jobs)
 ```
 
-    C:\Users\tobia\AppData\Local\Temp\ipykernel_22936\869645819.py:13: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\869645819.py:13: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
       sum_sim += token.similarity(token_other)
 
 
@@ -875,7 +875,7 @@ def job_description_similarity_counter(post1, post2, sim_lim=0.75):
 sim_matrix = create_similarity_matrix(job_description_similarity_counter, jobs)
 ```
 
-    C:\Users\tobia\AppData\Local\Temp\ipykernel_22936\4255546514.py:16: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\4255546514.py:16: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
       if token.similarity(token_other) >= sim_lim:
 
 
@@ -973,8 +973,12 @@ categories_ = [job1_category, job2_category, job3_category, job4_category, job5_
 
 
 ```python
-def get_most_common_noun(job_description):
-    nlp = spacy.load("en_core_web_lg")
+nlp = spacy.load("en_core_web_lg")
+```
+
+
+```python
+def get_most_common_noun(nlp, job_description):
     doc = nlp(job_description)
     words = dict()
     for token in doc:
@@ -988,7 +992,7 @@ def get_most_common_noun(job_description):
 
 
 ```python
-get_most_common_noun(jobs_[4])
+get_most_common_noun(nlp, jobs_[4])
 ```
 
 
@@ -1000,7 +1004,7 @@ get_most_common_noun(jobs_[4])
 
 
 ```python
-get_most_common_noun(jobs_[1])
+get_most_common_noun(nlp, jobs_[1])
 ```
 
 
@@ -1018,7 +1022,7 @@ fixed_categories_ = []
 for i, category in enumerate(categories_):
     if type(category) == float:
         # overwrite it
-        fixed_categories_ += [get_most_common_noun(jobs_[i])]
+        fixed_categories_ += [get_most_common_noun(nlp, jobs_[i])]
     else:
         fixed_categories_ += [category]
 ```
@@ -1059,7 +1063,7 @@ eval_similarity(sim_matrix, labels)
 
 
 ​    
-![png](res/word2vec-job-posts-similarity_91_0.png)
+![png](res/word2vec-job-posts-similarity_92_0.png)
 ​    
 
 
@@ -1164,7 +1168,7 @@ eval_similarity(sim_matrix, labels, k=0)
 
 
 ​    
-![png](res/word2vec-job-posts-similarity_104_0.png)
+![png](res/word2vec-job-posts-similarity_105_0.png)
 ​    
 
 
@@ -1191,7 +1195,7 @@ eval_similarity(sim_matrix, labels, k=0)
 
 
 ​    
-![png](res/word2vec-job-posts-similarity_108_0.png)
+![png](res/word2vec-job-posts-similarity_109_0.png)
 ​    
 
 
@@ -1275,7 +1279,7 @@ eval_similarity(sim_matrix, labels)
 
 
 ​    
-![png](res/word2vec-job-posts-similarity_118_0.png)
+![png](res/word2vec-job-posts-similarity_119_0.png)
 ​    
 
 
@@ -1331,10 +1335,10 @@ def job_title_points(nlp, title1, title2):
 def job_category_points(nlp, category1, category2, description1, description2):
     # fix the category if it nothing
     if type(category1) == float:
-        category1 = get_most_common_noun(description1)
+        category1 = get_most_common_noun(nlp, description1)
         
     if type(category2) == float:
-        category2 = get_most_common_noun(description2)
+        category2 = get_most_common_noun(nlp, description2)
         
     # build doc
     doc1 = nlp(category1)
@@ -1492,18 +1496,251 @@ post
 
 ```python
 #data.sample(n=50, replace=False)
-#res = get_similar_job_posts(data.head(50), post, title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5)
+res = get_similar_job_posts(data.head(50), post, title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5)
 ```
+
+    Calculate post 0...
+    Calculate post 1...
+    Calculate post 2...
+    Calculate post 3...
+    Calculate post 4...
+    Calculate post 5...
+    Calculate post 6...
+    Calculate post 7...
+
+
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\1465696467.py:14: UserWarning: [W008] Evaluating Doc.similarity based on empty vectors.
+      sim = doc1.similarity(doc2)
+
+
+    Calculate post 8...
+    Calculate post 9...
+    Calculate post 10...
+    Calculate post 11...
+    Calculate post 12...
+    Calculate post 13...
+    Calculate post 14...
+    Calculate post 15...
+    Calculate post 16...
+    Calculate post 17...
+    Calculate post 18...
+    Calculate post 19...
+    Calculate post 20...
+    Calculate post 21...
+    Calculate post 22...
+    Calculate post 23...
+    Calculate post 24...
+    Calculate post 25...
+    Calculate post 26...
+    Calculate post 27...
+    Calculate post 28...
+    Calculate post 29...
+    Calculate post 30...
+    Calculate post 31...
+    Calculate post 32...
+    Calculate post 33...
+    Calculate post 34...
+    Calculate post 35...
+    Calculate post 36...
+    Calculate post 37...
+    Calculate post 38...
+    Calculate post 39...
+    Calculate post 40...
+    Calculate post 41...
+    Calculate post 42...
+    Calculate post 43...
+    Calculate post 44...
+    Calculate post 45...
+    Calculate post 46...
+    Calculate post 47...
+    Calculate post 48...
+    Calculate post 49...
+
+
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\3918599366.py:43: SettingWithCopyWarning: 
+    A value is trying to be set on a copy of a slice from a DataFrame.
+    Try using .loc[row_indexer,col_indexer] = value instead
+    
+    See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+      all_job_posts.loc[:, ['score']] = score
+
 
 
 ```python
-#res.head()
+res.head()
 ```
 
 
-```python
-#get_similar_job_posts(data.head(50), post, title_w=2.0, category_w=0.0, type_w=1.0, pos_w=0.5, printing=False).head()
-```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>crawl_timestamp</th>
+      <th>url</th>
+      <th>job_title</th>
+      <th>category</th>
+      <th>company_name</th>
+      <th>city</th>
+      <th>state</th>
+      <th>country</th>
+      <th>inferred_city</th>
+      <th>inferred_state</th>
+      <th>...</th>
+      <th>job_type</th>
+      <th>salary_offered</th>
+      <th>job_board</th>
+      <th>geo</th>
+      <th>cursor</th>
+      <th>contact_email</th>
+      <th>contact_phone_number</th>
+      <th>uniq_id</th>
+      <th>html_job_description</th>
+      <th>score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>33</th>
+      <td>2019-02-06 08:30:12</td>
+      <td>https://www.careerbuilder.com/job/J3M2F963CC58...</td>
+      <td>Senior Data Scientist - Tallahassee, FL - $150...</td>
+      <td>business and financial operations</td>
+      <td>Jefferson Frank</td>
+      <td>Tallahassee</td>
+      <td>FL</td>
+      <td>Usa</td>
+      <td>Tallahassee</td>
+      <td>Florida</td>
+      <td>...</td>
+      <td>Full Time</td>
+      <td>NaN</td>
+      <td>careerbuilder</td>
+      <td>usa</td>
+      <td>1549440025100072</td>
+      <td>NaN</td>
+      <td>813 437 6882</td>
+      <td>d33577ea9ae09c58d77e1fab2c012ba2</td>
+      <td>NaN</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>2019-02-06 08:31:04</td>
+      <td>https://www.careerbuilder.com/job/J3V7V35YMD61...</td>
+      <td>Data Scientist Tampa, FL $110-130K</td>
+      <td>business and financial operations</td>
+      <td>Jefferson Frank</td>
+      <td>Tampa</td>
+      <td>FL</td>
+      <td>Usa</td>
+      <td>Tampa</td>
+      <td>Florida</td>
+      <td>...</td>
+      <td>Full Time</td>
+      <td>NaN</td>
+      <td>careerbuilder</td>
+      <td>usa</td>
+      <td>1549440025192604</td>
+      <td>NaN</td>
+      <td>813 437 6899 (ext 6899)</td>
+      <td>acfd50bf4d44eb476ec69b38348355be</td>
+      <td>NaN</td>
+      <td>14</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>2019-02-06 08:28:00</td>
+      <td>https://www.careerbuilder.com/job/J2Y3W15X0M6C...</td>
+      <td>Data Scientist</td>
+      <td>business and financial operations</td>
+      <td>5 Star Global Recruitment Partners, LLC</td>
+      <td>Dallas</td>
+      <td>TX</td>
+      <td>Usa</td>
+      <td>Dallas</td>
+      <td>Texas</td>
+      <td>...</td>
+      <td>Full Time</td>
+      <td>NaN</td>
+      <td>careerbuilder</td>
+      <td>usa</td>
+      <td>1549440025102978</td>
+      <td>NaN</td>
+      <td>256-651-8116</td>
+      <td>09378ddde9b997b1acbf519c2b9ddf03</td>
+      <td>NaN</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>2019-02-06 08:27:40</td>
+      <td>https://www.careerbuilder.com/job/J3N45J6TDR75...</td>
+      <td>Data Scientist</td>
+      <td>business and financial operations</td>
+      <td>Grant Thornton LLP</td>
+      <td>Alexandria</td>
+      <td>VA</td>
+      <td>Usa</td>
+      <td>Alexandria</td>
+      <td>Virginia</td>
+      <td>...</td>
+      <td>Full Time</td>
+      <td>NaN</td>
+      <td>careerbuilder</td>
+      <td>usa</td>
+      <td>1549440025120561</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1b148bd2e730d37c7afd2cbf0e7e7824</td>
+      <td>NaN</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>2019-02-06 08:29:24</td>
+      <td>https://www.careerbuilder.com/job/J3P8GK6Q0NNR...</td>
+      <td>Clinical Data Scientist</td>
+      <td>business and financial operations</td>
+      <td>Aerotek</td>
+      <td>Waltham</td>
+      <td>MA</td>
+      <td>Usa</td>
+      <td>Waltham</td>
+      <td>Massachusetts</td>
+      <td>...</td>
+      <td>Full Time</td>
+      <td>NaN</td>
+      <td>careerbuilder</td>
+      <td>usa</td>
+      <td>1549440025277619</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>674c331993a36bb28fd4cf302ce66e9d</td>
+      <td>NaN</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 23 columns</p>
+</div>
+
+
 
 **Ergebnis:**
 
@@ -1522,22 +1759,159 @@ Ziel ist es die Ausführung performanter zu gestalten. Hierzu 2 Gedanken:
 - Reduzierung der Daten (random Wahl)
 - Paralleles Ausführen
 
-In diesem Experiment wird die Performancesteigerung durch Multiprocessing evaluiert.
+In diesem Experiment wird die Performancesteigerung durch Threading evaluiert.
 
-1. Umschreiben des Algorithmus, für Prallelisierung:
+Folgendes wurde probiert, hat jedoch nicht funktioniert:
+- multiprocessing -> windows collaps -> memory out of memory
+- dask apply -> nein, dafür zu viele funktionen
+- threading -> ja
+
 
 
 ```python
-def calc_points(job_posts:pd.DataFrame, job_post, nlp, pruning, title_w, category_w, type_w, pos_w, printing):
+import sys
+import time
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.cm import ScalarMappable
+import seaborn as sn
+
+import spacy
+from spacy.tokens import Token
+
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+
+import multiprocessing as mp
+from threading import Thread
+
+
+
+def get_most_common_noun(job_description):
+    nlp = spacy.load("en_core_web_lg")
+    doc = nlp(job_description)
+    words = dict()
+    for token in doc:
+        if token.pos_ in ["NOUN", "PROPN"]:
+            if token.text in words.keys():
+                words[token.text] += 1
+            else:
+                words[token.text] = 1
+    return sorted(words.items(), key=lambda x:x[0])[0][0]           
+
+
+
+def job_title_points(nlp, title1, title2):
+    doc1 = nlp(title1)
+    doc2 = nlp(title2)
+    sim = doc1.similarity(doc2)
+    
+    if sim >= 0.95:
+        return 5
+    elif sim >= 0.9:
+        return 4
+    elif sim >= 0.8:
+        return 2
+    elif sim >= 0.7:
+        return 1
+    else:
+        return 0
+
+
+
+def job_category_points(nlp, category1, category2, description1, description2):
+    # fix the category if it nothing
+    if type(category1) == float:
+        category1 = get_most_common_noun(description1)
+        
+    if type(category2) == float:
+        category2 = get_most_common_noun(description2)
+        
+    # build doc
+    doc1 = nlp(category1)
+    doc2 = nlp(category2)
+    
+    # calc similarity
+    sim = doc1.similarity(doc2)
+    
+    if sim >= 0.95:
+        return 5
+    elif sim >= 0.9:
+        return 3
+    elif sim >= 0.8:
+        return 1
+    else:
+        return 0
+
+
+
+def job_type_points(type1, type2):
+    res = 0
+    if type1 == "Undefined" or type2 == "Undefined":
+        res = 0
+    elif type1 == type2:
+        res = 5
+    elif (type1 == "Full Time" and type2 == "Contract") or (type2 == "Full Time" and type1 == "Contract"):
+        res = 0
+    elif (type1 == "Part Time" and type2 == "Full Time") or (type2 == "Part Time" and type1 == "Full Time"):
+        res = 2
+    elif (type1 == "Part Time" and type2 == "Internship") or (type2 == "Part Time" and type1 == "Internship"):
+        res = 1
+    elif (type1 == "Full Time" and type2 == "Internship") or (type2 == "Full Time" and type1 == "Internship"):
+        res = 0
+    elif (type1 == "Contract" and type2 == "Internship") or (type2 == "Contract" and type1 == "Internship"):
+        res = 0
+    return res
+
+
+
+def job_location_points(city1, country1, city2, country2):
+    # Initialize Nominatim API
+    geolocator = Nominatim(user_agent="MyApp")
+
+    location1 = geolocator.geocode(f"{city1} {country1}", language="en", timeout=10000)
+    location2 = geolocator.geocode(f"{city2} {country2}", language="en", timeout=10000)
+    
+    if location1 == None or location2 == None:
+        return 0
+    
+    pos1 = (location1.latitude, location1.longitude)
+    pos2 = (location2.latitude, location2.longitude)
+    
+    sim = 1 / (geodesic(pos1, pos2).km+1)
+    
+    if sim >= 0.1:
+        return 5
+    elif sim >= 0.07:
+        return 4
+    elif sim >= 0.03:
+        return 3
+    elif sim >= 0.01:
+        return 1
+    else:
+        return 0
+
+
+
+def log(txt:str, should_show=False):
+    if should_show: print("\n"+txt+"\n")
+
+
+
+def calc_points(result, job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing):
     
     # create score-list
     score = np.array([0]*len(job_posts))
+
+    offset = job_posts.index.start
     
     for post_idx in range(len(job_posts)):
         #if printing: print(f"Calculate post {post_idx}...")
         # points for job-title similarity
         if title_w != 0:
-            score[post_idx] += job_title_points(nlp, job_post[2], job_posts.loc[post_idx, :]['job_title']) * title_w
+            score[post_idx] += job_title_points(nlp, job_post[2], job_posts.loc[post_idx+offset, :]['job_title']) * title_w
 
         # pruning -> if 0 points at the first, than skip
         if pruning and score[post_idx] == 0:
@@ -1545,46 +1919,38 @@ def calc_points(job_posts:pd.DataFrame, job_post, nlp, pruning, title_w, categor
 
         # points for job-category similarity
         if category_w != 0:
-            score[post_idx] += job_category_points(nlp, job_post[3], job_posts['category'][post_idx], \
-                                               job_post[12], job_posts['job_description'][post_idx]) * category_w
+            score[post_idx] += job_category_points(nlp, job_post[3], job_posts['category'][post_idx+offset], \
+                                            job_post[12], job_posts['job_description'][post_idx+offset]) * category_w
 
         # points for job-type similarity  
         if type_w != 0:
-            score[post_idx] += job_type_points(job_post[13], job_posts['job_type'][post_idx]) * type_w
+            score[post_idx] += job_type_points(job_post[13], job_posts['job_type'][post_idx+offset]) * type_w
 
 
         # points for job-location similarity  
         if pos_w != 0:
-            score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts['city'][post_idx], \
-                                               job_posts['country'][post_idx]) * pos_w
+            score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts['city'][post_idx+offset], \
+                                            job_posts['country'][post_idx+offset]) * pos_w
+
+        progress[0] += 1
+        progress_bar(progress[0], total)
+
     # return all posts with more than x points
     job_posts.loc[:, ['score']] = score
     log(f"One Process finished!", printing)
-    return job_posts
-```
+    result += [job_posts]
+    #return job_posts
 
 
-```python
-def log(txt:str, should_show=False):
-    if should_show: print(txt)
-```
-
-
-```python
 # all categories gets between 0-5 points
 def get_similar_job_posts_parallel(job_posts:pd.DataFrame, job_post:list, min_points=5, pruning=False, \
-                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True):
+                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True, thread_amount=2):
     log_sym = "x"
     # load other job posts 
     all_job_posts = job_posts
     
-    # open pool
-    log(f"Starting {mp.cpu_count()} processes...", printing)
-    pool = mp.Pool(mp.cpu_count())
-    log(log_sym, printing)
-    
     # split
-    n = pool._processes
+    n = thread_amount   #mp.cpu_count()
     log(f"Splitting data into {n} portions...", printing)
     max_ = len(all_job_posts)//n
     job_post_portions = []
@@ -1602,264 +1968,357 @@ def get_similar_job_posts_parallel(job_posts:pd.DataFrame, job_post:list, min_po
     log(log_sym, printing)
     
     # start processes / calc parallel the points / similarity
-    log(f"Starts parallel calculation of the similarity/points...", printing)
-    args = (job_post, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
-    results = [pool.apply(calc_points, args=(jobs,)+args) for jobs in job_post_portions]
-    log(log_sym, printing)
-    log(f"Finished with the parallel calculation of the similarity/points...", printing)
+    log(f"Starts parallel calculation of the similarity/points with {n} Threads...", printing)
+    progress = [0]    # use this for changing
+    total = job_posts.shape[0]
+    args = (job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
+    results = []
+    threads = []
+    for jobs in job_post_portions:
+        t = Thread(target=calc_points, args=(results, jobs,)+args)
+        threads += [t]
+        t.start()
+    #log(log_sym, printing)
+    #log(f"Created Threads and they running...\n", printing)
 
-    # close mp pool
-    pool.close() 
+    # wait until finishes
+    #log(f"Waiting for finishing tasks...", printing)
+    for t in threads: 
+        t.join()
+    log(log_sym, printing)
+    log(f"Finished with the parallel calculation of the similarity/points...\n", printing)
     
     # merge
     log(f"Merging scored job posts...", printing)
-    scored_job_posts = results[0]
-    for result in results[1:]:
-        scored_job_posts.append(result, ignore_index=True)
-    log(log_sym, printing)
+    if len(results) > 0:
+        scored_job_posts = results[0]
+        for result in results[1:]:
+            scored_job_posts.append(result, ignore_index=True)
+        log(log_sym, printing)
+        
+        # take only important results and sort them
+        log(f"Sorting scored job posts...", printing)
+        r = scored_job_posts[scored_job_posts['score'] >= min_points].sort_values(by="score", ascending=False)
+        log(log_sym, printing)
+        return r
+
+
+def get_number_input(msg:str, min=None, max=None):
+    wrong_input = True
+    while wrong_input:
+        #addition = ""
+        #if min != None:
+        #    addition += f"(min={min})"
+        #if max != None:
+        #    if min != None:
+        #        addition += ", "
+        #    addition += f"(max={max})"
+        user_input = input(f"{msg}:")#+addition
+
+        if user_input == "exit":
+            sys.exit()
+
+        try:
+            result = int(user_input)
+            if min != None and max != None:
+                if result >= min and result <= max:
+                    wrong_input = False
+                else:
+                    print("Try again. Type a number.")# + addition)
+            elif min != None and max == None:
+                if result >= min:
+                    wrong_input = False
+                else:
+                    print("Try again. Type a number.")
+            elif min == None and max != None:
+                if result <= max:
+                    wrong_input = False
+                else:
+                    print("Try again. Type a number.")
+        except ValueError:
+            pass
+    return result
+
+
+def print_job_post(job_post):
+    width = 64
+    job_str = f"\n{'-'*width}\n{' '*((width//2)-8)}>>> Job Post <<<\n{'-'*width}\n"
+    job_str += f"\n\nTitle: {job_post[2]}\n"
+    job_str += f"\nCategory: {job_post[3]}\n"
+    job_str += f"\nLocation: {job_post[5]} in {job_post[7]}\n"
+    job_str += f"\nType: {job_post[13]}\n"
+    job_str += f"\nDespription:\n\n {'-'*width}{job_post[12]}\n{'-'*width}\n\n"
+    print(job_str)
+
+
+def progress_bar(progress, total):
+    percentage = 100 * (progress/float(total))
+    bar = '#'*int(percentage) + '-'*(100-int(percentage))
+    print(f"\r[{bar}] {percentage:.2f}%", end="\r")
+
+
+def calc_points_experiment(result, job_posts:pd.DataFrame, job_post, time_, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing):
     
-    # take only important results and sort them
-    log(f"Sorting scored job posts...", printing)
-    r = scored_job_posts[scored_job_posts['score'] >= min_points].sort_values(by="score", ascending=False)
-    log(log_sym, printing)
-    return r
-```
+    # create score-list
+    score = np.array([0]*len(job_posts))
+
+    offset = job_posts.index.start
+    
+    for post_idx in range(len(job_posts)):
+        #if printing: print(f"Calculate post {post_idx}...")
+        # points for job-title similarity
+        start = time.time()
+        if title_w != 0:
+            score[post_idx] += job_title_points(nlp, job_post[2], job_posts.loc[post_idx+offset, :]['job_title']) * title_w
+        duration = round(time.time() - start, 2)
+        time_['title'] += duration
+
+        # pruning -> if 0 points at the first, than skip
+        if pruning and score[post_idx] == 0:
+            continue
+
+        # points for job-category similarity
+        start = time.time()
+        if category_w != 0:
+            score[post_idx] += job_category_points(nlp, job_post[3], job_posts['category'][post_idx+offset], \
+                                            job_post[12], job_posts['job_description'][post_idx+offset]) * category_w
+        duration = round(time.time() - start, 2)
+        time_['category'] += duration
+
+        # points for job-type similarity  
+        start = time.time()
+        if type_w != 0:
+            score[post_idx] += job_type_points(job_post[13], job_posts['job_type'][post_idx+offset]) * type_w
+        duration = round(time.time() - start, 2)
+        time_['type'] += duration
+
+        # points for job-location similarity  
+        start = time.time()
+        if pos_w != 0:
+            score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts['city'][post_idx+offset], \
+                                            job_posts['country'][post_idx+offset]) * pos_w
+        duration = round(time.time() - start, 2)
+        time_['location'] += duration
 
 
-```python
-#%%timeit -r 1 -n 1
-#get_similar_job_posts_parallel(data.head(1000), post, title_w=2.0, category_w=0.0, \
-#                                               type_w=1.0, pos_w=0.5, printing=True).head()
-```
+        progress[0] += 1
+        progress_bar(progress[0], total)
 
-### Problem: Infinite runtime
-
-Problem is that the multiprocessing didn't work on jupyter notebook but you can play around with writing in extra python file.
-
-Trying with Dask.
-
-https://examples.dask.org/applications/embarrassingly-parallel.html
+    # return all posts with more than x points
+    job_posts.loc[:, ['score']] = score
+    log(f"One Process finished!", printing)
+    result += [job_posts]
 
 
-```python
+
 # all categories gets between 0-5 points
-def get_similar_job_posts_parallel(job_posts, job_post:list, min_points=5, pruning=False, \
-                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True):
-    log_sym = "x"
+def get_similar_job_posts_experiment(job_posts:pd.DataFrame, job_post:list, min_points=5, pruning=False, \
+                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True, thread_amount=2):
+    time_ = {'title':0, 'location':0, 'type':0, 'category':0}
     # load other job posts 
     all_job_posts = job_posts
+    
+    # split
+    n = thread_amount   
+    max_ = len(all_job_posts)//n
+    job_post_portions = []
+    pointer = 0
+    for i in range(n):
+        job_post_portions += [all_job_posts.iloc[pointer:pointer+max_, :]]
+        pointer += len(all_job_posts)//n
      
-    
     # calc points
-    log(f"Loading SpaCy en_core_web_lg corpus...", printing)
     nlp = spacy.load("en_core_web_lg")
-    log(log_sym, printing)
-    
+
     # start processes / calc parallel the points / similarity
-    log(f"Starts parallel calculation of the similarity/points...", printing)
-    args = (job_post, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
-    results = all_job_posts.apply(calc_points, axis=1, args=(jobs,)+args).compute()
-    log(log_sym, printing)
-    log(f"Finished with the parallel calculation of the similarity/points...", printing)
+    progress = [0]    # use this for changing
+    total = job_posts.shape[0]
+    args = (job_post, time_, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
+    results = []
+    threads = []
+    for jobs in job_post_portions:
+        t = Thread(target=calc_points_experiment, args=(results, jobs,)+args)
+        threads += [t]
+        t.start()
+
+    # wait until finishes
+    for t in threads: 
+        t.join()
     
     # merge
-    log(f"Merging scored job posts...", printing)
-    scored_job_posts = results[0]
-    for result in results[1:]:
-        scored_job_posts.append(result, ignore_index=True)
-    log(log_sym, printing)
+    if len(results) > 0:
+        scored_job_posts = results[0]
+        for result in results[1:]:
+            scored_job_posts.append(result, ignore_index=True)
+        
+        # take only important results and sort them
+        r = scored_job_posts[scored_job_posts['score'] >= min_points].sort_values(by="score", ascending=False)
+    return f"   title: {time_['title']} seconds<br>\n   location: {time_['location']} seconds\n   type: {time_['type']} seconds\n   category: {time_['category']} seconds"
+
+
+def time_experiment():
+    data = pd.read_excel("./data_scientist_united_states_job_postings_jobspikr.xlsx")
+    post = data.values.tolist()[33]
+
+    results = ""
+
+    for i in [10, 100, 1000, 10000]:
+        print(f"Startet {i} samples...")
+        results += f"{'-'*64}\nSample Size = {i}\n{'-'*64}\n"
+        for n in [1, 2, 5, 10]:
+            print("Waiting for geopy...")
+            time.sleep(10)
+            print(f"Try on {n} Threads...")
+            start = time.time()
+            output = get_similar_job_posts_experiment(data.head(i), post, title_w=2.0, category_w=0.0, type_w=1.0, pos_w=0.5, printing=False, thread_amount=n)
+            duration = time.time()-start
+            results += f"\nThreads: {n} needed {duration:.2f} seconds\n{output}\n"
+            print(f"\nThreads: {n} needed {duration:.2f} seconds")
+        print(f"\n------------\n")
+
+    # saving in file
+    with open("./time_experiment_reults.txt", "w") as file:
+        file.write(results)
     
-    # take only important results and sort them
-    log(f"Sorting scored job posts...", printing)
-    r = scored_job_posts[scored_job_posts['score'] >= min_points].sort_values(by="score", ascending=False)
-    log(log_sym, printing)
-    return r
+
+def main():
+    data = pd.read_excel("./data_scientist_united_states_job_postings_jobspikr.xlsx")
+    choose_a_post = False
+    while not choose_a_post:
+        post_id = get_number_input(f"Type a number between 0 and {data.shape[0]} to choose a job post", 0, data.shape[0]-1)
+        
+        post = data.values.tolist()[post_id]
+        print_job_post(post)
+        answer = get_number_input("Is this ok? (1=yes / 0=no)", 0, 1)
+        if answer == 1:
+            choose_a_post = True
+
+
+    posts = get_similar_job_posts_parallel(data.head(2), post, title_w=2.0, category_w=0.0, \
+                                            type_w=1.0, pos_w=0.5, printing=False)
+
+
+    cur_idx = 0
+    offset = posts.index[0]
+    print("-----\nNavigate with 'next', 'prev', 'exit'\n-----")
+    while True:
+        print_job_post(posts[cur_idx+offset])
+        user_input = input("User:")
+        if user_input == "next":
+            if cur_idx < posts.shape[0]-1:
+                cur_idx += 1
+        elif user_input == "prev":
+            if cur_idx > 0:
+                cur_idx -= 1
+        elif user_input == "exit":
+            print("bye")
+            break
 ```
-
-
-```python
-excel_file = "../data_scientist_united_states_job_postings_jobspikr.xlsx"
-parts = d.delayed(pd.read_excel)(excel_file)
-df = dd.from_delayed(parts)
-
-post_id = 33
-post = data.values.tolist()[post_id]
-
-posts = get_similar_job_posts_parallel(df, post, title_w=2.0, category_w=0.0, \
-                                               type_w=1.0, pos_w=0.5, printing=True)
-posts.head()
-```
-
-    Loading SpaCy en_core_web_lg corpus...
-    x
-    Starts parallel calculation of the similarity/points...
-
-
-
-    ---------------------------------------------------------------------------
-    
-    TypeError                                 Traceback (most recent call last)
-    
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\dataframe\utils.py:177, in raise_on_meta_error(funcname, udf)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=175'>176</a> try:
-    --> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=176'>177</a>     yield
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=177'>178</a> except Exception as e:
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\dataframe\core.py:6086, in _emulate(func, udf, *args, **kwargs)
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6084'>6085</a> with raise_on_meta_error(funcname(func), udf=udf):
-    -> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6085'>6086</a>     return func(*_extract_meta(args, True), **_extract_meta(kwargs, True))
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\utils.py:1018, in methodcaller.__call__(self, _methodcaller__obj, *args, **kwargs)
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/utils.py?line=1016'>1017</a> def __call__(self, __obj, *args, **kwargs):
-    -> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/utils.py?line=1017'>1018</a>     return getattr(__obj, self.method)(*args, **kwargs)
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\frame.py:8833, in DataFrame.apply(self, func, axis, raw, result_type, args, **kwargs)
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/frame.py?line=8823'>8824</a> op = frame_apply(
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/frame.py?line=8824'>8825</a>     self,
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/frame.py?line=8825'>8826</a>     func=func,
-       (...)
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/frame.py?line=8830'>8831</a>     kwargs=kwargs,
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/frame.py?line=8831'>8832</a> )
-    -> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/frame.py?line=8832'>8833</a> return op.apply().__finalize__(self, method="apply")
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py:727, in FrameApply.apply(self)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=724'>725</a>     return self.apply_raw()
-    --> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=726'>727</a> return self.apply_standard()
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py:851, in FrameApply.apply_standard(self)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=849'>850</a> def apply_standard(self):
-    --> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=850'>851</a>     results, res_index = self.apply_series_generator()
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=852'>853</a>     # wrap results
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py:867, in FrameApply.apply_series_generator(self)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=864'>865</a> for i, v in enumerate(series_gen):
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=865'>866</a>     # ignore SettingWithCopy here in case the user mutates
-    --> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=866'>867</a>     results[i] = self.f(v)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=867'>868</a>     if isinstance(results[i], ABCSeries):
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=868'>869</a>         # If we have a view on v, we need to make a copy because
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=869'>870</a>         #  series_generator will swap out the underlying data
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py:138, in Apply.__init__.<locals>.f(x)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=136'>137</a> def f(x):
-    --> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/pandas/core/apply.py?line=137'>138</a>     return func(x, *args, **kwargs)
-
-
-    TypeError: calc_points() takes 9 positional arguments but 10 were given
-
-
-​    
-    The above exception was the direct cause of the following exception:
-
-
-    ValueError                                Traceback (most recent call last)
-    
-    d:\Studium\4. Semester\Module\NLP\Praktikum\2022_05_16 Job Posts Similarity\Word2Vec-Ansatz\word2vec-job-posts-similarity.ipynb Cell 142' in <cell line: 8>()
-          <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000151?line=4'>5</a> post_id = 33
-          <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000151?line=5'>6</a> post = data.values.tolist()[post_id]
-    ----> <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000151?line=7'>8</a> posts = get_similar_job_posts_parallel(df, post, title_w=2.0, category_w=0.0, \
-          <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000151?line=8'>9</a>                                                type_w=1.0, pos_w=0.5, printing=True)
-         <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000151?line=9'>10</a> posts.head()
-
-
-    d:\Studium\4. Semester\Module\NLP\Praktikum\2022_05_16 Job Posts Similarity\Word2Vec-Ansatz\word2vec-job-posts-similarity.ipynb Cell 141' in get_similar_job_posts_parallel(job_posts, job_post, min_points, pruning, title_w, category_w, type_w, pos_w, printing)
-         <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000140?line=14'>15</a> log(f"Starts parallel calculation of the similarity/points...", printing)
-         <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000140?line=15'>16</a> args = (job_post, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
-    ---> <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000140?line=16'>17</a> results = all_job_posts.apply(calc_points, axis=1, args=(jobs,)+args).compute()
-         <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000140?line=17'>18</a> log(log_sym, printing)
-         <a href='vscode-notebook-cell:/d%3A/Studium/4.%20Semester/Module/NLP/Praktikum/2022_05_16%20Job%20Posts%20Similarity/Word2Vec-Ansatz/word2vec-job-posts-similarity.ipynb#ch0000140?line=18'>19</a> log(f"Finished with the parallel calculation of the similarity/points...", printing)
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\dataframe\core.py:5236, in DataFrame.apply(self, func, axis, broadcast, raw, reduce, args, meta, result_type, **kwds)
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=5232'>5233</a>     raise NotImplementedError(msg)
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=5234'>5235</a> if meta is no_default:
-    -> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=5235'>5236</a>     meta = _emulate(
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=5236'>5237</a>         M.apply, self._meta_nonempty, func, args=args, udf=True, **kwds
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=5237'>5238</a>     )
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=5238'>5239</a>     warnings.warn(meta_warning(meta))
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=5239'>5240</a> kwds.update({"parent_meta": self._meta})
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\dataframe\core.py:6086, in _emulate(func, udf, *args, **kwargs)
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6080'>6081</a> """
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6081'>6082</a> Apply a function using args / kwargs. If arguments contain dd.DataFrame /
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6082'>6083</a> dd.Series, using internal cache (``_meta``) for calculation
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6083'>6084</a> """
-       <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6084'>6085</a> with raise_on_meta_error(funcname(func), udf=udf):
-    -> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/core.py?line=6085'>6086</a>     return func(*_extract_meta(args, True), **_extract_meta(kwargs, True))
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\contextlib.py:137, in _GeneratorContextManager.__exit__(self, typ, value, traceback)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=134'>135</a>     value = typ()
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=135'>136</a> try:
-    --> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=136'>137</a>     self.gen.throw(typ, value, traceback)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=137'>138</a> except StopIteration as exc:
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=138'>139</a>     # Suppress StopIteration *unless* it's the same exception that
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=139'>140</a>     # was passed to throw().  This prevents a StopIteration
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=140'>141</a>     # raised inside the "with" statement from being suppressed.
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/contextlib.py?line=141'>142</a>     return exc is not value
-
-
-    File c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\dataframe\utils.py:198, in raise_on_meta_error(funcname, udf)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=188'>189</a> msg += (
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=189'>190</a>     "Original error is below:\n"
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=190'>191</a>     "------------------------\n"
-       (...)
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=194'>195</a>     "{2}"
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=195'>196</a> )
-        <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=196'>197</a> msg = msg.format(f" in `{funcname}`" if funcname else "", repr(e), tb)
-    --> <a href='file:///c%3A/Users/tobia/anaconda3/envs/ai/lib/site-packages/dask/dataframe/utils.py?line=197'>198</a> raise ValueError(msg) from e
-
-
-    ValueError: Metadata inference failed in `apply`.
-    
-    You have supplied a custom function and Dask is unable to 
-    determine the type of output that that function returns. 
-    
-    To resolve this please provide a meta= keyword.
-    The docstring of the Dask function you ran should have more information.
-    
-    Original error is below:
-    ------------------------
-    TypeError('calc_points() takes 9 positional arguments but 10 were given')
-    
-    Traceback:
-    ---------
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\dataframe\utils.py", line 177, in raise_on_meta_error
-        yield
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\dataframe\core.py", line 6086, in _emulate
-        return func(*_extract_meta(args, True), **_extract_meta(kwargs, True))
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\dask\utils.py", line 1018, in __call__
-        return getattr(__obj, self.method)(*args, **kwargs)
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\frame.py", line 8833, in apply
-        return op.apply().__finalize__(self, method="apply")
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py", line 727, in apply
-        return self.apply_standard()
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py", line 851, in apply_standard
-        results, res_index = self.apply_series_generator()
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py", line 867, in apply_series_generator
-        results[i] = self.f(v)
-      File "c:\Users\tobia\anaconda3\envs\ai\lib\site-packages\pandas\core\apply.py", line 138, in f
-        return func(x, *args, **kwargs)
-
-
 
 **Evaluation**
 
+Es wurde oben ein umfangreiches Experiment der Performance angefertigt und durchgeführt. Dabei wurden verschiedene Größen an Daten mit unterschiedlicher Anzahl an Threads verglichen. 
 
-```python
+Folgende Ergbnisse kamen dabei heraus:
 
-```
 
----
-(sementic)
-description similarity [see here](https://towardsdatascience.com/semantic-similarity-using-transformers-8f3cb5bf66d6) or [here](https://www.sbert.net/docs/usage/semantic_textual_similarity.html)
+----------------------------------------------------------------
+Sample Size = 10
+
+----------------------------------------------------------------
+<br>
+Threads: 1 needed 11.29 seconds<br>
+   title: 0.09999999999999999 seconds<br>
+   location: 9.540000000000001 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 2 needed 10.95 seconds<br>
+   title: 0.11999999999999998 seconds<br>
+   location: 18.689999999999998 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 5 needed 10.97 seconds<br>
+   title: 0.32000000000000006 seconds<br>
+   location: 43.14 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 10 needed 11.14 seconds<br>
+   title: 1.1500000000000004 seconds<br>
+   location: 69.10999999999999 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+
+----------------------------------------------------------------
+Sample Size = 100
+
+----------------------------------------------------------------
+<br>
+Threads: 1 needed 101.38 seconds<br>
+   title: 1.0000000000000007 seconds<br>
+   location: 98.57999999999994 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+
+Threads: 2 needed 100.93 seconds<br>
+   title: 1.0200000000000007 seconds<br>
+   location: 197.66000000000005 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 5 needed 100.94 seconds<br>
+   title: 1.2300000000000009 seconds<br>
+   location: 491.9500000000004 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 10 needed 101.42 seconds<br>
+   title: 5.389999999999981 seconds<br>
+   location: 969.7200000000006 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+
+----------------------------------------------------------------
+Sample Size = 1000
+
+----------------------------------------------------------------
+<br>
+Threads: 1 needed 1000.94 seconds<br>
+   title: 10.03999999999983 seconds<br>
+   location: 988.9200000000056 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 2 needed 1000.92 seconds<br>
+   title: 10.01999999999983 seconds<br>
+   location: 1986.7700000000077 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 5 needed 1001.33 seconds<br>
+   title: 11.799999999999793 seconds<br>
+   location: 4980.899999999963 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+<br>
+Threads: 10 needed 1000.99 seconds<br>
+   title: 10.839999999999813 seconds<br>
+   location: 9959.869999999924 seconds<br>
+   type: 0.0 seconds<br>
+   category: 0.0 seconds<br>
+
+
+**Ergebnis:**
+
+Die Experimente zeigen, dass die zeitliche Differenz bei 1, 2, 5 oder 10 Threads lediglich beica. 1 Sekunde liegen. Dabei ist auch kein Muster zu erkennen. So brauchen die 5 Threads bei 1000 Daten ca. 1 Sekunde länger als die anderen 3 Verfahren. Bei 100 Daten gehört es jedoch zu den Schnellsten. Die kleinen Differenzen scheinen in keiner Kausalität mit dem Threading zu stehen.
+
+Wie nach der Theorie her vermutet, bringt das Threading also keinen zeitlichen Vorteil. Die zeitlichen Fluktuationen stammen wahrscheinlich von der schwankenden Rechenpower des Laptops.
+
+Jedoch ist etwas anderes sehr schön zu sehen. Die Berechnung für den Ort bzw. dessen Abstand beträgt ca. 99% der Laufzeit bei 1000 Daten. Der Vergleich der Titel beträgt etwa 10 Sekunden, unabhängig von der Anzahl an Daten. <br>
+Ohne den Ort wäre der Algorithmus also immer etwa 10 Sekunden schnell, was das Problem löst.
 
 ---
 
@@ -1873,7 +2332,7 @@ Dafür hat dies über den Job-Titel und der Word2Vec-Technik sehr gut funktionie
 Wie das Experiment 10 gezeigt hat, kann man dieses Verfahren in Verbindung mit anderen Ähnlichkeiten einsetzen, um so ein individuelles Ähnlickeitsmaß herstellen zu können. <br>
 <br>
 Ein größeres Problem ist die Performance. Es existieren nämlich sehr viele Job-Posts und um alle zu verwenden, wird viel Zeit in Anspruch genommen.<br>
-Als Lösungsansatz könnte man zum einen nicht alle Daten verwenden (zufällig 1/4 der Daten) und zum anderen könnte der Prozess der Punkteberechnung in 2 oder mehr parallele Prozesse geteilt werden.
+Als Lösungsansatz werden nicht alle Daten verwenden (zufällig 1000 der Daten). Multiprocessing/Threading scheinen keine Lösung zu sein.
 
 ---
 ### Anwendung
@@ -1882,30 +2341,332 @@ Als Lösungsansatz könnte man zum einen nicht alle Daten verwenden (zufällig 1
 
 
 ```python
+import sys
+import time
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.cm import ScalarMappable
+import seaborn as sn
+
+import spacy
+from spacy.tokens import Token
+
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+
+import multiprocessing as mp
+from threading import Thread
+
+
+
+def get_most_common_noun(job_description, nlp):
+    #nlp = spacy.load("en_core_web_lg")
+    doc = nlp(job_description)
+    words = dict()
+    for token in doc:
+        if token.pos_ in ["NOUN", "PROPN"]:
+            if token.text in words.keys():
+                words[token.text] += 1
+            else:
+                words[token.text] = 1
+    return sorted(words.items(), key=lambda x:x[0])[0][0]           
+
+
+
+def job_title_points(nlp, title1, title2):
+    doc1 = nlp(title1)
+    doc2 = nlp(title2)
+    sim = doc1.similarity(doc2)
+    
+    if sim >= 0.95:
+        return 5
+    elif sim >= 0.9:
+        return 4
+    elif sim >= 0.8:
+        return 2
+    elif sim >= 0.7:
+        return 1
+    else:
+        return 0
+
+
+
+def job_category_points(nlp, category1, category2, description1, description2):
+    # fix the category if it nothing
+    if type(category1) == float:
+        category1 = get_most_common_noun(description1, nlp)
+        
+    if type(category2) == float:
+        category2 = get_most_common_noun(description2, nlp)
+        
+    # build doc
+    doc1 = nlp(category1)
+    doc2 = nlp(category2)
+    
+    # calc similarity
+    sim = doc1.similarity(doc2)
+    
+    if sim >= 0.95:
+        return 5
+    elif sim >= 0.9:
+        return 3
+    elif sim >= 0.8:
+        return 1
+    else:
+        return 0
+
+
+
+def job_type_points(type1, type2):
+    res = 0
+    if type1 == "Undefined" or type2 == "Undefined":
+        res = 0
+    elif type1 == type2:
+        res = 5
+    elif (type1 == "Full Time" and type2 == "Contract") or (type2 == "Full Time" and type1 == "Contract"):
+        res = 0
+    elif (type1 == "Part Time" and type2 == "Full Time") or (type2 == "Part Time" and type1 == "Full Time"):
+        res = 2
+    elif (type1 == "Part Time" and type2 == "Internship") or (type2 == "Part Time" and type1 == "Internship"):
+        res = 1
+    elif (type1 == "Full Time" and type2 == "Internship") or (type2 == "Full Time" and type1 == "Internship"):
+        res = 0
+    elif (type1 == "Contract" and type2 == "Internship") or (type2 == "Contract" and type1 == "Internship"):
+        res = 0
+    return res
+
+
+
+def job_location_points(city1, country1, city2, country2):
+    # Initialize Nominatim API
+    geolocator = Nominatim(user_agent="MyApp")
+
+    location1 = geolocator.geocode(f"{city1} {country1}", language="en", timeout=10000)
+    location2 = geolocator.geocode(f"{city2} {country2}", language="en", timeout=10000)
+    
+    if location1 == None or location2 == None:
+        return 0
+    
+    pos1 = (location1.latitude, location1.longitude)
+    pos2 = (location2.latitude, location2.longitude)
+    
+    sim = 1 / (geodesic(pos1, pos2).km+1)
+    
+    if sim >= 0.1:
+        return 5
+    elif sim >= 0.07:
+        return 4
+    elif sim >= 0.03:
+        return 3
+    elif sim >= 0.01:
+        return 1
+    else:
+        return 0
+
+
+def log(txt:str, should_show=False):
+    if should_show: print("\n"+txt+"\n")
+
+
+def calc_points(job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing):
+    
+    # create score-list
+    score = np.array([0]*len(job_posts))
+    
+    for post_idx in range(len(job_posts)):  #
+        #if printing: print(f"Calculate post {post_idx}...")
+        # points for job-title similarity
+        # old: job_posts['job_description'][post_idx]
+        if title_w != 0:
+            score[post_idx] += job_title_points(nlp, job_post[2], job_posts.iloc[post_idx, 2]) * title_w
+
+        # pruning -> if 0 points at the first, than skip
+        if pruning and score[post_idx] == 0:
+            continue
+
+        # points for job-category similarity
+        if category_w != 0:
+            score[post_idx] += job_category_points(nlp, job_post[3], job_posts.iloc[post_idx, 3], \
+                                            job_post[12], job_posts.iloc[post_idx, 12]) * category_w
+
+        # points for job-type similarity  
+        if type_w != 0:
+            score[post_idx] += job_type_points(job_post[13], job_posts.iloc[post_idx, 13]) * type_w
+
+
+        # points for job-location similarity  
+        if pos_w != 0:
+            print("WARNING: CALC LOCATION IS EXPENSIVE!")
+            score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts.iloc[post_idx, 5], \
+                                           job_posts.iloc[post_idx, 7]) * pos_w
+
+        progress[0] += 1
+        progress_bar(progress[0], total)
+
+    # return all posts with more than x points
+    job_posts.loc[:, ['score']] = score
+    log(f"One Process finished!", printing)
+    return job_posts
+
+
+# all categories gets between 0-5 points
+def get_similar_job_posts(job_posts:pd.DataFrame, job_post:list, min_points=5, pruning=False, \
+                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True):
+    log_sym = "x"
+    # load other job posts 
+    all_job_posts = job_posts
+    
+    # calc points
+    log(f"Loading SpaCy en_core_web_lg corpus...", printing)
+    nlp = spacy.load("en_core_web_lg")
+    log(log_sym, printing)
+    
+    # start processes / calc parallel the points / similarity
+    log(f"Starts calculation of the similarity/points...", printing)
+    progress = [0]    # use this for changing
+    total = job_posts.shape[0]
+    args = (job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
+    scored_job_posts = calc_points(all_job_posts, *args)
+    log(log_sym, printing)
+    
+    # sort and return
+    if len(scored_job_posts) > 0:
+        # take only important results and sort them
+        log(f"Sorting scored job posts...", printing)
+        r = scored_job_posts[scored_job_posts['score'] >= min_points].sort_values(by="score", ascending=False)
+        log(log_sym, printing)
+        return r
+
+
+def get_number_input(msg:str, min, max):
+    wrong_input = True
+    while wrong_input:
+        #addition = ""
+        #if min != None:
+        #    addition += f"(min={min})"
+        #if max != None:
+        #    if min != None:
+        #        addition += ", "
+        #    addition += f"(max={max})"
+        user_input = input(f"{msg}:")#+addition
+
+        if user_input == "exit":
+            sys.exit()
+
+        try:
+            result = int(user_input)
+            if result >= min and result <= max:
+                wrong_input = False
+            else:
+                print("Try again. Type a number.")# + addition)
+        except ValueError:
+            pass
+    return result
+
+def get_float_number_input(msg:str, min:float, max:float):
+    wrong_input = True
+    while wrong_input:
+        user_input = input(f"{msg}:")
+
+        if user_input == "exit":
+            sys.exit()
+        elif user_input == "":
+            return None
+
+        try:
+            result = float(user_input)
+            if result >= min and result <= max:
+                wrong_input = False
+            else:
+                print("Try again. Type a float number.")
+        except ValueError:
+            pass
+    return result
+
+
+def get_bool_input(msg:str):
+    wrong_input = True
+    while wrong_input:
+        user_input = input(f"{msg}:")
+
+        if user_input == "exit":
+            sys.exit()
+        elif user_input in ["y", "", "yes", "1"]:
+            result = 1
+            wrong_input = False
+        elif user_input in ["no", "0", "n"]:
+            result = 0
+            wrong_input = False
+
+    return result
+
+
+def print_job_post(job_post, with_r=False):
+    width = 64
+    job_str = ""
+    if with_r:
+        job_str += "\r"
+    job_str += f"\n{'-'*width}\n{' '*((width//2)-8)}>>> Job Post <<<\n{'-'*width}\n"
+    job_str += f"\n\nTitle: {job_post[2]}\n"
+    job_str += f"\nCategory: {job_post[3]}\n"
+    job_str += f"\nLocation: {job_post[5]} in {job_post[7]}\n"
+    job_str += f"\nType: {job_post[13]}\n"
+    job_str += f"\nDespription:\n\n {'-'*width}\n\n{job_post[12]}\n{'-'*width}\n"
+    if with_r:
+        print(job_str, end="\r")
+    else:
+        print(job_str)
+
+
+def progress_bar(progress, total):
+    percentage = 100 * (progress/float(total))
+    bar = '#'*int(percentage) + '-'*(100-int(percentage))
+    print(f"\r[{bar}] {percentage:.2f}%", end="\r")
+    
+
 def main():
-    #data = pd.read_excel("./data_scientist_united_states_job_postings_jobspikr.xlsx")
-    data = ds.read_excel("./data_scientist_united_states_job_postings_jobspikr.xlsx")
+    # load data
+    data = pd.read_excel("./data_scientist_united_states_job_postings_jobspikr.xlsx")
     choose_a_post = False
+
+    # choose a post
     while not choose_a_post:
-        post_id = get_number_input("Choose one number to choose a job post ", 0, data.shape[0]-1)
+        post_id = get_number_input(f"Type a number between 0 and {data.shape[0]} to choose a job post", 0, data.shape[0]-1)
         
         post = data.values.tolist()[post_id]
         print_job_post(post)
-        answer = get_number_input("Is this ok? (1=yes / 0=no)", 0, 1)
+        answer = get_bool_input("Is this ok? (y/n)")
         if answer == 1:
             choose_a_post = True
 
+    # choose weights
+    title_w = get_float_number_input(f"How important is the title? Type a number between 0.0 and 3.0 or pass/enter", 0.0, 3.0)
+    title_w = 2.0 if title_w == None else title_w
+    category_w = get_float_number_input(f"How important is the category? Type a number between 0.0 and 3.0 or pass/enter", 0.0, 3.0)
+    category_w = 1.0 if category_w == None else category_w
+    type_w = get_float_number_input(f"How important is the type? Type a number between 0.0 and 3.0 or pass/enter", 0.0, 3.0)
+    type_w = 0.0 if type_w == None else type_w
+    pos_w = get_float_number_input(f"How important is the location? Type a number between 0.0 and 3.0 or pass/enter", 0.0, 3.0)
+    pos_w = 0.0 if pos_w == None else pos_w
 
-    posts = get_similar_job_posts_parallel(data.head(1000), post, title_w=2.0, category_w=0.0, \
-                                            type_w=1.0, pos_w=0.5, printing=True).head()
+    # calc scores -> get similar job posts
+    start = time.time()
+    #data.sample(n=2000, replace=False)
+    posts = get_similar_job_posts(data.sample(n=1000, replace=False), post, title_w=title_w, category_w=category_w, \
+                                            type_w=type_w, pos_w=pos_w, printing=False)
+    duration = time.time() - start
+    print(f"\n\nFounded similiar posts in {duration:.2f} seconds")
 
 
+    # navigate in example
     cur_idx = 0
     print("-----\nNavigate with 'next', 'prev', 'exit'\n-----")
     while True:
-        print_job_post(posts[cur_idx])
+        print_job_post(posts.iloc[cur_idx, :], False)
         user_input = input("User:")
-        if user_input == "next":
+        if user_input == "next" or user_input == "":
             if cur_idx < posts.shape[0]-1:
                 cur_idx += 1
         elif user_input == "prev":
@@ -1914,6 +2675,11 @@ def main():
         elif user_input == "exit":
             print("bye")
             break
+```
+
+
+```python
+#main()
 ```
 
 ---
