@@ -11,6 +11,7 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
 import multiprocessing as mp
+from threading import Thread
 
 
 
@@ -121,20 +122,22 @@ def job_location_points(city1, country1, city2, country2):
 
 
 def log(txt:str, should_show=False):
-    if should_show: print(txt)
+    if should_show: print("\n"+txt+"\n")
 
 
 
-def calc_points(job_posts:pd.DataFrame, job_post, nlp, pruning, title_w, category_w, type_w, pos_w, printing):
+def calc_points(result, job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing):
     
     # create score-list
     score = np.array([0]*len(job_posts))
+
+    offset = job_posts.index.start
     
     for post_idx in range(len(job_posts)):
         #if printing: print(f"Calculate post {post_idx}...")
         # points for job-title similarity
         if title_w != 0:
-            score[post_idx] += job_title_points(nlp, job_post[2], job_posts.loc[post_idx, :]['job_title']) * title_w
+            score[post_idx] += job_title_points(nlp, job_post[2], job_posts.loc[post_idx+offset, :]['job_title']) * title_w
 
         # pruning -> if 0 points at the first, than skip
         if pruning and score[post_idx] == 0:
@@ -142,22 +145,27 @@ def calc_points(job_posts:pd.DataFrame, job_post, nlp, pruning, title_w, categor
 
         # points for job-category similarity
         if category_w != 0:
-            score[post_idx] += job_category_points(nlp, job_post[3], job_posts['category'][post_idx], \
-                                               job_post[12], job_posts['job_description'][post_idx]) * category_w
+            score[post_idx] += job_category_points(nlp, job_post[3], job_posts['category'][post_idx+offset], \
+                                            job_post[12], job_posts['job_description'][post_idx+offset]) * category_w
 
         # points for job-type similarity  
         if type_w != 0:
-            score[post_idx] += job_type_points(job_post[13], job_posts['job_type'][post_idx]) * type_w
+            score[post_idx] += job_type_points(job_post[13], job_posts['job_type'][post_idx+offset]) * type_w
 
 
         # points for job-location similarity  
         if pos_w != 0:
-            score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts['city'][post_idx], \
-                                               job_posts['country'][post_idx]) * pos_w
+            score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts['city'][post_idx+offset], \
+                                            job_posts['country'][post_idx+offset]) * pos_w
+
+        progress[0] += 1
+        progress_bar(progress, total)
+
     # return all posts with more than x points
     job_posts.loc[:, ['score']] = score
     log(f"One Process finished!", printing)
-    return job_posts
+    result += [job_posts]
+    #return job_posts
 
 
 # all categories gets between 0-5 points
@@ -167,15 +175,8 @@ def get_similar_job_posts_parallel(job_posts:pd.DataFrame, job_post:list, min_po
     # load other job posts 
     all_job_posts = job_posts
     
-    # open pool
-    amount = mp.cpu_count()
-    amount = 2
-    log(f"Starting {mp.cpu_count()} processes...", printing)
-    pool = mp.Pool(amount)
-    log(log_sym, printing)
-    
     # split
-    n = pool._processes
+    n = 2    #mp.cpu_count()
     log(f"Splitting data into {n} portions...", printing)
     max_ = len(all_job_posts)//n
     job_post_portions = []
@@ -193,14 +194,25 @@ def get_similar_job_posts_parallel(job_posts:pd.DataFrame, job_post:list, min_po
     log(log_sym, printing)
     
     # start processes / calc parallel the points / similarity
-    log(f"Starts parallel calculation of the similarity/points...", printing)
-    args = (job_post, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
-    results = [pool.apply(calc_points, args=(jobs,)+args) for jobs in job_post_portions]
-    log(log_sym, printing)
-    log(f"Finished with the parallel calculation of the similarity/points...", printing)
+    log(f"Starts parallel calculation of the similarity/points with {n} Threads...", printing)
+    results = []
+    progress = [0]    # use this for changing
+    args = (job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
+    total = job_posts.shape[0]
+    threads = []
+    for jobs in job_post_portions:
+        t = Thread(target=calc_points, args=(results, jobs,)+args)
+        threads += [t]
+        t.start()
+    #log(log_sym, printing)
+    #log(f"Created Threads and they running...\n", printing)
 
-    # close mp pool
-    pool.close() 
+    # wait until finishes
+    #log(f"Waiting for finishing tasks...", printing)
+    for t in threads: 
+        t.join()
+    log(log_sym, printing)
+    log(f"Finished with the parallel calculation of the similarity/points...\n", printing)
     
     # merge
     log(f"Merging scored job posts...", printing)
@@ -239,19 +251,25 @@ def get_number_input(msg:str, min=None, max=None):
                 if result >= min:
                     wrong_input = False
                 else:
-                    print("Try again. Type a number." + addition)
+                    print("Try again. Type a number.")
             elif min == None and max != None:
                 if result <= max:
                     wrong_input = False
                 else:
-                    print("Try again. Type a number." + addition)
+                    print("Try again. Type a number.")
         except ValueError:
             pass
     return result
 
 
 def print_job_post(job_post):
-    print(job_post)
+    print("\n-*8\nJob Post\n-*8\n"+job_post+"\n-*8\n")
+
+
+def progress_bar(progress, total):
+    percentage = 100 * (progress/float(total))
+    bar = '#'*int(percentage) + '-'*(100-int(percentage))
+    print(f"\r|{bar}| {percentage:.2f}%", end="\r")
 
 
 if __name__ == "__main__":
@@ -268,13 +286,14 @@ if __name__ == "__main__":
 
 
     posts = get_similar_job_posts_parallel(data.head(100), post, title_w=2.0, category_w=0.0, \
-                                            type_w=1.0, pos_w=0.5, printing=True).head()
+                                            type_w=1.0, pos_w=0.5, printing=True)
 
 
+    offset = posts.index.start
     cur_idx = 0
     print("-----\nNavigate with 'next', 'prev', 'exit'\n-----")
     while True:
-        print_job_post(posts[cur_idx])
+        print_job_post(posts[cur_idx+offset])
         user_input = input("User:")
         if user_input == "next":
             if cur_idx < posts.shape[0]-1:
