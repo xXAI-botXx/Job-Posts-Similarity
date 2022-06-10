@@ -1,0 +1,82 @@
+
+----------------------------------------------------------------
+Sample Size = 10
+----------------------------------------------------------------
+
+Threads: 1 needed 11.29 seconds
+   title: 0.09999999999999999 seconds
+   location: 9.540000000000001 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 2 needed 10.95 seconds
+   title: 0.11999999999999998 seconds
+   location: 18.689999999999998 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 5 needed 10.97 seconds
+   title: 0.32000000000000006 seconds
+   location: 43.14 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 10 needed 11.14 seconds
+   title: 1.1500000000000004 seconds
+   location: 69.10999999999999 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+----------------------------------------------------------------
+Sample Size = 100
+----------------------------------------------------------------
+
+Threads: 1 needed 101.38 seconds
+   title: 1.0000000000000007 seconds
+   location: 98.57999999999994 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 2 needed 100.93 seconds
+   title: 1.0200000000000007 seconds
+   location: 197.66000000000005 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 5 needed 100.94 seconds
+   title: 1.2300000000000009 seconds
+   location: 491.9500000000004 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 10 needed 101.42 seconds
+   title: 5.389999999999981 seconds
+   location: 969.7200000000006 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+----------------------------------------------------------------
+Sample Size = 1000
+----------------------------------------------------------------
+
+Threads: 1 needed 1000.94 seconds
+   title: 10.03999999999983 seconds
+   location: 988.9200000000056 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 2 needed 1000.92 seconds
+   title: 10.01999999999983 seconds
+   location: 1986.7700000000077 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 5 needed 1001.33 seconds
+   title: 11.799999999999793 seconds
+   location: 4980.899999999963 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
+
+Threads: 10 needed 1000.99 seconds
+   title: 10.839999999999813 seconds
+   location: 9959.869999999924 seconds
+   type: 0.0 seconds
+   category: 0.0 seconds
