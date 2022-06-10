@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -159,7 +161,7 @@ def calc_points(result, job_posts:pd.DataFrame, job_post, progress, total, nlp, 
                                             job_posts['country'][post_idx+offset]) * pos_w
 
         progress[0] += 1
-        progress_bar(progress, total)
+        progress_bar(progress[0], total)
 
     # return all posts with more than x points
     job_posts.loc[:, ['score']] = score
@@ -170,13 +172,13 @@ def calc_points(result, job_posts:pd.DataFrame, job_post, progress, total, nlp, 
 
 # all categories gets between 0-5 points
 def get_similar_job_posts_parallel(job_posts:pd.DataFrame, job_post:list, min_points=5, pruning=False, \
-                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True):
+                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True, thread_amount=2):
     log_sym = "x"
     # load other job posts 
     all_job_posts = job_posts
     
     # split
-    n = 2    #mp.cpu_count()
+    n = thread_amount   #mp.cpu_count()
     log(f"Splitting data into {n} portions...", printing)
     max_ = len(all_job_posts)//n
     job_post_portions = []
@@ -195,10 +197,10 @@ def get_similar_job_posts_parallel(job_posts:pd.DataFrame, job_post:list, min_po
     
     # start processes / calc parallel the points / similarity
     log(f"Starts parallel calculation of the similarity/points with {n} Threads...", printing)
-    results = []
     progress = [0]    # use this for changing
-    args = (job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
     total = job_posts.shape[0]
+    args = (job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
+    results = []
     threads = []
     for jobs in job_post_portions:
         t = Thread(target=calc_points, args=(results, jobs,)+args)
@@ -240,6 +242,9 @@ def get_number_input(msg:str, min=None, max=None):
         #    addition += f"(max={max})"
         user_input = input(f"{msg}:")#+addition
 
+        if user_input == "exit":
+            sys.exit()
+
         try:
             result = int(user_input)
             if min != None and max != None:
@@ -263,20 +268,30 @@ def get_number_input(msg:str, min=None, max=None):
 
 
 def print_job_post(job_post):
-    print("\n-*8\nJob Post\n-*8\n"+job_post+"\n-*8\n")
+    width = 64
+    job_str = f"\n{'-'*width}\n{' '*((width//2)-8)}>>> Job Post <<<\n{'-'*width}\n"
+    job_str += f"\n\nTitle: {job_post[2]}\n"
+    job_str += f"\nCategory: {job_post[3]}\n"
+    job_str += f"\nLocation: {job_post[5]} in {job_post[7]}\n"
+    job_str += f"\nType: {job_post[13]}\n"
+    job_str += f"\nDespription:\n\n {'-'*width}{job_post[12]}\n{'-'*width}\n\n"
+    print(job_str)
 
 
 def progress_bar(progress, total):
     percentage = 100 * (progress/float(total))
     bar = '#'*int(percentage) + '-'*(100-int(percentage))
-    print(f"\r|{bar}| {percentage:.2f}%", end="\r")
+    print(f"\r[{bar}] {percentage:.2f}%", end="\r")
 
+
+def time_experiment():
+    pass
 
 if __name__ == "__main__":
     data = pd.read_excel("./data_scientist_united_states_job_postings_jobspikr.xlsx")
     choose_a_post = False
     while not choose_a_post:
-        post_id = get_number_input("Choose one number to choose a job post ", 0, data.shape[0]-1)
+        post_id = get_number_input(f"Type a number between 0 and {data.shape[0]} to choose a job post", 0, data.shape[0]-1)
         
         post = data.values.tolist()[post_id]
         print_job_post(post)
@@ -285,12 +300,12 @@ if __name__ == "__main__":
             choose_a_post = True
 
 
-    posts = get_similar_job_posts_parallel(data.head(100), post, title_w=2.0, category_w=0.0, \
-                                            type_w=1.0, pos_w=0.5, printing=True)
+    posts = get_similar_job_posts_parallel(data.head(2), post, title_w=2.0, category_w=0.0, \
+                                            type_w=1.0, pos_w=0.5, printing=False)
 
 
-    offset = posts.index.start
     cur_idx = 0
+    offset = posts.index[0]
     print("-----\nNavigate with 'next', 'prev', 'exit'\n-----")
     while True:
         print_job_post(posts[cur_idx+offset])
