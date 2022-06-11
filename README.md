@@ -4276,8 +4276,8 @@ get_similar_job_posts(sample, post, title_w=2.0, category_w=1.0, type_w=0.0, pos
 
 **Erbegnis:**
 
-<img src="./profiling.png" width="500px">
-<img src="./profiling_category.png" width="500px">
+<img src="./Word2Vec-Ansatz/profiling.png" width="500px">
+<img src="./Word2Vec-Ansatz/profiling_category.png" width="500px">
 
 Auffällig ist die Laufzeit der Berechnung der Kategorie, wobei dort viel Laufzeit in das bestimmen des Hauptworts steckt (ca. 6 Sekunden).<br>
 Wie viel Zeit das Weglassen dieses Prozesses bringt muss noch extern evaluiert werden. <br>
