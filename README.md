@@ -25,6 +25,9 @@ by Tobia Ippolito
     - [Parallelisierung](#Experiment-11:-Paralleles-Ausführen)
 - [Evaluation](#Evaluation)
 - [Anwendung](#Anwendung)
+- [Profiling](#Profiling)
+- [Location Runtime Test](#Location-Runtime-Test)
+- [Trimmed Category Calc](#Trimmed-Category-Calc)
 
 <br>
 
@@ -107,9 +110,9 @@ from geopy.distance import geodesic
 
 import multiprocessing as mp
 
-import dask as d
-import dask.dataframe as dd
-from dask.delayed import delayed
+import time
+import cProfile
+import warnings
 ```
 
 ---
@@ -128,7 +131,7 @@ from dask.delayed import delayed
 
     Requirement already satisfied: openpyxl in c:\users\tobia\anaconda3\envs\ai\lib\site-packages (3.0.10)
     Requirement already satisfied: et-xmlfile in c:\users\tobia\anaconda3\envs\ai\lib\site-packages (from openpyxl) (1.1.0)
-
+    
 
 
 ```python
@@ -152,7 +155,7 @@ data.head()
     .dataframe tbody tr th {
         vertical-align: top;
     }
-    
+
     .dataframe thead th {
         text-align: right;
     }
@@ -346,7 +349,7 @@ data.info()
      21  html_job_description  1599 non-null   object        
     dtypes: datetime64[ns](2), float64(1), int64(1), object(18)
     memory usage: 1.7+ MB
-
+    
 
 
 ```python
@@ -465,9 +468,9 @@ eval_similarity(template, ["job1", "job2", "job3", "job4", "job5"])
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_23_0.png)
-​    
+    
 
 
 Die Jobs 3-5 sind ähnliche Jobs und sonst sind alle verschieden.
@@ -594,9 +597,9 @@ eval_similarity(similarity, job_labels, heatmap=True)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_38_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -667,9 +670,9 @@ eval_similarity(sim_matrix, job_labels)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_46_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -718,9 +721,9 @@ eval_similarity(similarity, job_labels, heatmap=True)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_52_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -789,9 +792,9 @@ def job_description_sum_similarity(post1, post2):
 sim_matrix = create_similarity_matrix(job_description_sum_similarity, jobs)
 ```
 
-    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\869645819.py:13: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_10196\869645819.py:13: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
       sum_sim += token.similarity(token_other)
-
+    
 
 
 ```python
@@ -799,9 +802,9 @@ eval_similarity(sim_matrix, job_labels)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_59_0.png)
-​    
+    
 
 
 **Ergebnis:** 
@@ -875,9 +878,9 @@ def job_description_similarity_counter(post1, post2, sim_lim=0.75):
 sim_matrix = create_similarity_matrix(job_description_similarity_counter, jobs)
 ```
 
-    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\4255546514.py:16: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_10196\4255546514.py:16: UserWarning: [W008] Evaluating Token.similarity based on empty vectors.
       if token.similarity(token_other) >= sim_lim:
-
+    
 
 
 ```python
@@ -885,9 +888,9 @@ eval_similarity(sim_matrix, job_labels)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_66_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -939,9 +942,9 @@ eval_similarity(sim_matrix, labels)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_76_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -1062,9 +1065,9 @@ eval_similarity(sim_matrix, labels)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_92_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -1167,9 +1170,9 @@ eval_similarity(sim_matrix, labels, k=0)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_105_0.png)
-​    
+    
 
 
 Now evaluate it
@@ -1194,9 +1197,9 @@ eval_similarity(sim_matrix, labels, k=0)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_109_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -1278,9 +1281,9 @@ eval_similarity(sim_matrix, labels)
 ```
 
 
-​    
+    
 ![png](res/word2vec-job-posts-similarity_119_0.png)
-​    
+    
 
 
 **Ergebnis:**
@@ -1507,11 +1510,11 @@ res = get_similar_job_posts(data.head(50), post, title_w=2.0, category_w=1.0, ty
     Calculate post 5...
     Calculate post 6...
     Calculate post 7...
+    
 
-
-    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\1465696467.py:14: UserWarning: [W008] Evaluating Doc.similarity based on empty vectors.
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_10196\1465696467.py:14: UserWarning: [W008] Evaluating Doc.similarity based on empty vectors.
       sim = doc1.similarity(doc2)
-
+    
 
     Calculate post 8...
     Calculate post 9...
@@ -1555,15 +1558,15 @@ res = get_similar_job_posts(data.head(50), post, title_w=2.0, category_w=1.0, ty
     Calculate post 47...
     Calculate post 48...
     Calculate post 49...
+    
 
-
-    C:\Users\tobia\AppData\Local\Temp\ipykernel_15404\3918599366.py:43: SettingWithCopyWarning: 
+    C:\Users\tobia\AppData\Local\Temp\ipykernel_10196\3918599366.py:43: SettingWithCopyWarning: 
     A value is trying to be set on a copy of a slice from a DataFrame.
     Try using .loc[row_indexer,col_indexer] = value instead
     
     See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
       all_job_posts.loc[:, ['score']] = score
-
+    
 
 
 ```python
@@ -1582,7 +1585,7 @@ res.head()
     .dataframe tbody tr th {
         vertical-align: top;
     }
-    
+
     .dataframe thead th {
         text-align: right;
     }
@@ -2320,8 +2323,6 @@ Wie nach der Theorie her vermutet, bringt das Threading also keinen zeitlichen V
 Jedoch ist etwas anderes sehr schön zu sehen. Die Berechnung für den Ort bzw. dessen Abstand beträgt ca. 99% der Laufzeit bei 1000 Daten. Der Vergleich der Titel beträgt etwa 10 Sekunden, unabhängig von der Anzahl an Daten. <br>
 Ohne den Ort wäre der Algorithmus also immer etwa 10 Sekunden schnell, was das Problem löst.
 
----
-
 ### Evaluation
 
 [<img src="./rackete_1.png" style="float:right" width=100></img>](#Table-of-Content)
@@ -2377,8 +2378,16 @@ def get_most_common_noun(job_description, nlp):
 
 def job_title_points(nlp, title1, title2):
     doc1 = nlp(title1)
-    doc2 = nlp(title2)
-    sim = doc1.similarity(doc2)
+    doc2 = nlp(title2) 
+
+    if (doc1.vector_norm) and (doc2.vector_norm):
+        try:
+            sim = doc1.similarity(doc2)
+        except Exception:
+            sim = 0.0
+    else:
+        #print("Title Vector is empty...")
+        sim = 0.0
     
     if sim >= 0.95:
         return 5
@@ -2394,12 +2403,14 @@ def job_title_points(nlp, title1, title2):
 
 
 def job_category_points(nlp, category1, category2, description1, description2):
+    if type(category1) == float or type(category2) == float:
+        return 0
     # fix the category if it nothing
-    if type(category1) == float:
-        category1 = get_most_common_noun(description1, nlp)
+    #if type(category1) == float:
+    #    category1 = get_most_common_noun(description1, nlp)
         
-    if type(category2) == float:
-        category2 = get_most_common_noun(description2, nlp)
+    #if type(category2) == float:
+    #    category2 = get_most_common_noun(description2, nlp)
         
     # build doc
     doc1 = nlp(category1)
@@ -2470,10 +2481,12 @@ def log(txt:str, should_show=False):
     if should_show: print("\n"+txt+"\n")
 
 
-def calc_points(job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing):
+def calc_points(job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing, show_progress):
     
     # create score-list
     score = np.array([0]*len(job_posts))
+
+    warning_called = False
     
     for post_idx in range(len(job_posts)):  #
         #if printing: print(f"Calculate post {post_idx}...")
@@ -2498,12 +2511,15 @@ def calc_points(job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning,
 
         # points for job-location similarity  
         if pos_w != 0:
-            print("WARNING: CALC LOCATION IS EXPENSIVE!")
+            if not warning_called:
+                print("\nWARNING: CALC LOCATION IS EXPENSIVE!\n")
+                warning_called = True
             score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts.iloc[post_idx, 5], \
                                            job_posts.iloc[post_idx, 7]) * pos_w
 
-        progress[0] += 1
-        progress_bar(progress[0], total)
+        if show_progress:
+            progress[0] += 1
+            progress_bar(progress[0], total)
 
     # return all posts with more than x points
     job_posts.loc[:, ['score']] = score
@@ -2513,7 +2529,10 @@ def calc_points(job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning,
 
 # all categories gets between 0-5 points
 def get_similar_job_posts(job_posts:pd.DataFrame, job_post:list, min_points=5, pruning=False, \
-                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True):
+                                  title_w=2.0, category_w=1.0, type_w=1.0, pos_w=0.5, printing=True, show_progress=True):
+
+    warnings.filterwarnings("ignore", message=r"\[W008\]", category=UserWarning)
+
     log_sym = "x"
     # load other job posts 
     all_job_posts = job_posts
@@ -2527,7 +2546,7 @@ def get_similar_job_posts(job_posts:pd.DataFrame, job_post:list, min_points=5, p
     log(f"Starts calculation of the similarity/points...", printing)
     progress = [0]    # use this for changing
     total = job_posts.shape[0]
-    args = (job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing)
+    args = (job_post, progress, total, nlp, pruning, title_w, category_w, type_w, pos_w, printing, show_progress)
     scored_job_posts = calc_points(all_job_posts, *args)
     log(log_sym, printing)
     
@@ -2627,6 +2646,9 @@ def progress_bar(progress, total):
     
 
 def main():
+    # supress warnings
+    warnings.filterwarnings("ignore", message=r"\[W008\]", category=UserWarning)
+
     # load data
     data = pd.read_excel("./data_scientist_united_states_job_postings_jobspikr.xlsx")
     choose_a_post = False
@@ -2681,5 +2703,1730 @@ def main():
 ```python
 #main()
 ```
+
+---
+
+### Profiling
+[<img src="./rackete_1.png" style="float:right" width=100></img>](#Table-of-Content)
+
+In diesem Abschnitt wird die Laufzeit genauer analysiert.
+
+
+
+
+```python
+data = pd.read_excel("../data_scientist_united_states_job_postings_jobspikr.xlsx")
+sample = data.sample(n=1000, replace=False)
+post = data.values.tolist()[33]
+```
+
+### [With cProfile](https://docs.python.org/3/library/profile.html#instant-user-s-manual)
+
+
+```python
+
+cProfile.run('get_similar_job_posts(sample, post, title_w=2.0, category_w=1.0, type_w=0.0, pos_w=0.0, printing=False, show_progress=False)',\
+         sort = 'cumtime')
+```
+
+             17210002 function calls (16350020 primitive calls) in 27.041 seconds
+    
+       Ordered by: cumulative time
+    
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+            1    0.000    0.000   27.073   27.073 {built-in method builtins.exec}
+            1    0.000    0.000   27.070   27.070 2466562680.py:185(get_similar_job_posts)
+            1    0.038    0.038   25.496   25.496 2466562680.py:138(calc_points)
+         4089    0.100    0.000   24.877    0.006 language.py:984(__call__)
+        16356    2.289    0.000   21.649    0.001 trainable_pipe.pyx:40(__call__)
+        16356    0.105    0.000   18.101    0.001 model.py:311(predict)
+    576549/32712    0.440    0.000   17.535    0.001 model.py:288(__call__)
+    200361/16356    0.539    0.000   16.755    0.001 chain.py:48(forward)
+         1000    0.008    0.000   14.802    0.015 2466562680.py:61(job_category_points)
+        28623    0.074    0.000   13.942    0.000 with_array.py:28(forward)
+         1000    0.009    0.000   10.416    0.010 2466562680.py:35(job_title_points)
+         8178    0.220    0.000    9.687    0.001 tb_framework.py:32(forward)
+        12267    0.076    0.000    9.272    0.001 with_array.py:69(_list_forward)
+        32712    0.115    0.000    8.634    0.000 residual.py:27(forward)
+         4089    0.044    0.000    8.182    0.002 tok2vec.py:112(predict)
+        40890    0.516    0.000    6.589    0.000 maxout.py:42(forward)
+        69513    5.793    0.000    5.869    0.000 numpy_ops.pyx:82(gemm)
+           89    0.031    0.000    5.352    0.060 2466562680.py:21(get_most_common_noun)
+        16356    0.055    0.000    4.421    0.000 with_array.py:86(_ragged_forward)
+    16356/8178    0.060    0.000    4.035    0.000 concatenate.py:43(forward)
+    16356/8178    0.042    0.000    3.786    0.000 concatenate.py:44(<listcomp>)
+        40890    0.437    0.000    3.086    0.000 layernorm.py:24(forward)
+        40890    0.177    0.000    2.256    0.000 layernorm.py:74(_get_moments)
+            1    0.000    0.000    1.572    1.572 __init__.py:30(load)
+            1    0.000    0.000    1.572    1.572 util.py:397(load_model)
+            1    0.000    0.000    1.571    1.571 util.py:430(load_model_from_package)
+            1    0.000    0.000    1.571    1.571 __init__.py:9(load)
+            1    0.000    0.000    1.571    1.571 util.py:591(load_model_from_init_py)
+            1    0.000    0.000    1.570    1.570 util.py:456(load_model_from_path)
+         4089    0.010    0.000    1.399    0.000 attributeruler.py:133(__call__)
+         8178    0.288    0.000    1.381    0.000 staticvectors.py:36(forward)
+            1    0.000    0.000    1.360    1.360 language.py:1991(from_disk)
+          9/1    0.011    0.001    1.359    1.359 util.py:1294(from_disk)
+        40890    0.635    0.000    1.310    0.000 hashembed.py:58(forward)
+        40890    0.041    0.000    1.128    0.000 {method 'var' of 'numpy.ndarray' objects}
+        40890    0.744    0.000    1.087    0.000 _methods.py:195(_var)
+         4089    0.899    0.000    1.033    0.000 attributeruler.py:149(match)
+            1    0.000    0.000    1.021    1.021 language.py:2017(deserialize_vocab)
+            1    0.000    0.000    1.021    1.021 {method 'from_disk' of 'spacy.vocab.Vocab' objects}
+            1    0.672    0.672    1.021    1.021 vocab.pyx:476(from_disk)
+        40890    0.951    0.000    0.955    0.000 numpy_ops.pyx:144(maxout)
+         4089    0.097    0.000    0.953    0.000 lemmatizer.py:121(__call__)
+        59734    0.549    0.000    0.833    0.000 lemmatizer.py:196(rule_lemmatize)
+         8178    0.065    0.000    0.792    0.000 _precomputable_affine.py:19(forward)
+        40890    0.039    0.000    0.745    0.000 {method 'mean' of 'numpy.ndarray' objects}
+       163580    0.741    0.000    0.741    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+        40890    0.321    0.000    0.707    0.000 _methods.py:162(_mean)
+        32712    0.024    0.000    0.702    0.000 expand_window.py:19(forward)
+         8178    0.180    0.000    0.680    0.000 model.py:824(set_dropout_rate)
+        32712    0.103    0.000    0.675    0.000 expand_window.py:26(_expand_window_floats)
+         5211    0.092    0.000    0.620    0.000 tokenizer.pyx:160(_tokenize_affixes)
+         4089    0.007    0.000    0.615    0.000 language.py:1090(_ensure_doc)
+         4089    0.014    0.000    0.606    0.000 language.py:1078(make_doc)
+         4089    0.006    0.000    0.591    0.000 tokenizer.pyx:147(__call__)
+    112363/63291    0.381    0.000    0.556    0.000 {built-in method numpy.core._multiarray_umath.implement_array_function}
+        32712    0.169    0.000    0.528    0.000 numpy_ops.pyx:190(seq2col)
+       286230    0.299    0.000    0.511    0.000 model.py:211(get_param)
+         4089    0.025    0.000    0.457    0.000 tagger.pyx:129(predict)
+       327535    0.258    0.000    0.434    0.000 model.py:370(_walk_bfs)
+         8178    0.409    0.000    0.412    0.000 {method 'find' of 'spacy.vectors.Vectors' objects}
+         9730    0.006    0.000    0.404    0.000 tokenizer.pyx:388(_tokenize)
+        40890    0.249    0.000    0.394    0.000 layernorm.py:60(_begin_update_scale_shift)
+        61341    0.047    0.000    0.390    0.000 <__array_function__ internals>:2(concatenate)
+       126936    0.383    0.000    0.383    0.000 numpy_ops.pyx:63(asarray)
+           19    0.003    0.000    0.366    0.019 tokenizer.pyx:570(_load_special_cases)
+         4149    0.014    0.000    0.363    0.000 tokenizer.pyx:594(add_special_case)
+         4089    0.151    0.000    0.353    0.000 attributeruler.py:158(set_annotations)
+        40891    0.033    0.000    0.333    0.000 {method 'sum' of 'numpy.ndarray' objects}
+        36801    0.111    0.000    0.328    0.000 ops.py:228(flatten)
+        16356    0.015    0.000    0.311    0.000 <__array_function__ internals>:2(hstack)
+        40891    0.017    0.000    0.300    0.000 _methods.py:46(_sum)
+         8178    0.057    0.000    0.284    0.000 linear.py:32(forward)
+         9730    0.029    0.000    0.281    0.000 tokenizer.pyx:445(_attach_tokens)
+        61335    0.065    0.000    0.266    0.000 ops.py:526(asarray1i)
+        16356    0.035    0.000    0.264    0.000 shape_base.py:285(hstack)
+            1    0.000    0.000    0.245    0.245 language.py:2029(<lambda>)
+            1    0.000    0.000    0.245    0.245 tokenizer.pyx:761(from_disk)
+            1    0.000    0.000    0.244    0.244 tokenizer.pyx:797(from_bytes)
+         6459    0.085    0.000    0.240    0.000 vocab.pyx:176(_new_lexeme)
+         3000    0.022    0.000    0.235    0.000 indexing.py:954(__getitem__)
+         9780    0.075    0.000    0.229    0.000 doc.pyx:665(__get__)
+        81780    0.200    0.000    0.227    0.000 _methods.py:66(_count_reduce_items)
+         8178    0.030    0.000    0.215    0.000 concatenate.py:78(_ragged_forward)
+        14402    0.011    0.000    0.213    0.000 vocab.pyx:142(get)
+         8178    0.021    0.000    0.206    0.000 concatenate.py:53(_array_forward)
+            1    0.000    0.000    0.204    0.204 util.py:494(load_model_from_config)
+            1    0.000    0.000    0.204    0.204 language.py:1664(from_config)
+        40890    0.056    0.000    0.203    0.000 ops.py:518(asarray_f)
+         4089    0.025    0.000    0.192    0.000 softmax.py:56(forward)
+       122670    0.087    0.000    0.190    0.000 ops.py:480(reshape)
+         8178    0.033    0.000    0.186    0.000 featureextractor.py:13(forward)
+       196272    0.133    0.000    0.183    0.000 ops.py:573(as_contig)
+    406244/406055    0.110    0.000    0.181    0.000 doc.pyx:443(__getitem__)
+        38188    0.056    0.000    0.179    0.000 typing.py:271(inner)
+         8180    0.012    0.000    0.178    0.000 <__array_function__ internals>:2(vstack)
+        16356    0.011    0.000    0.175    0.000 {method 'to_array' of 'spacy.tokens.doc.Doc' objects}
+         8178    0.034    0.000    0.175    0.000 list2ragged.py:21(forward)
+        16356    0.006    0.000    0.165    0.000 doc.pyx:921(to_array (wrapper))
+        43813    0.067    0.000    0.164    0.000 lemmatizer.py:8(is_base_form)
+         3000    0.007    0.000    0.163    0.000 frame.py:3592(_get_value)
+        16356    0.158    0.000    0.158    0.000 doc.pyx:921(to_array)
+        32712    0.024    0.000    0.157    0.000 numpy_ops.pyx:381(check_seq2col_lengths)
+         7780    0.059    0.000    0.154    0.000 doc.pyx:637(__get__)
+         3003    0.018    0.000    0.145    0.000 frame.py:3411(_ixs)
+         2000    0.002    0.000    0.143    0.000 {method 'similarity' of 'spacy.tokens.doc.Doc' objects}
+        73602    0.142    0.000    0.142    0.000 numpy_ops.pyx:79(alloc)
+         2000    0.029    0.000    0.141    0.000 doc.pyx:576(similarity)
+         8180    0.022    0.000    0.141    0.000 shape_base.py:222(vstack)
+         4149    0.106    0.000    0.139    0.000 vocab.pyx:267(make_fused_token)
+         8178    0.024    0.000    0.138    0.000 list2array.py:21(forward)
+         4089    0.022    0.000    0.136    0.000 ops.py:220(affine)
+            2    0.000    0.000    0.136    0.068 tokenizer.pyx:121(__set__)
+         8377    0.082    0.000    0.136    0.000 model.py:66(__init__)
+       220895    0.134    0.000    0.134    0.000 {method 'reshape' of 'numpy.ndarray' objects}
+            1    0.000    0.000    0.133    0.133 language.py:130(__init__)
+            1    0.000    0.000    0.132    0.132 language.py:85(tokenizer_factory)
+            2    0.000    0.000    0.132    0.066 _msgpack_api.py:43(read_msgpack)
+            1    0.000    0.000    0.132    0.132 tokenizer.pyx:35(__init__)
+            2    0.000    0.000    0.130    0.065 __init__.py:58(unpack)
+            2    0.129    0.065    0.129    0.065 {srsly.msgpack._unpacker.unpack}
+       286230    0.128    0.000    0.128    0.000 _param_server.py:39(has_param)
+        40890    0.094    0.000    0.126    0.000 types.py:846(__init__)
+        25194    0.047    0.000    0.123    0.000 typing.py:932(__hash__)
+            1    0.000    0.000    0.123    0.123 npyio.py:284(load)
+            1    0.000    0.000    0.122    0.122 format.py:699(read_array)
+            1    0.122    0.122    0.122    0.122 {built-in method numpy.fromfile}
+        20445    0.114    0.000    0.122    0.000 ops.py:255(unflatten)
+         9730    0.023    0.000    0.113    0.000 tokenizer.pyx:400(_split_affixes)
+        40890    0.031    0.000    0.109    0.000 ops.py:451(reshape2f)
+        40890    0.057    0.000    0.109    0.000 numpy_ops.pyx:224(hash)
+       646329    0.106    0.000    0.106    0.000 model.py:116(attrs)
+       147204    0.068    0.000    0.105    0.000 stringsource:657(memoryview_cwrapper)
+    16364/12275    0.028    0.000    0.105    0.000 {built-in method builtins.sum}
+           16    0.000    0.000    0.104    0.006 tokenizer.pyx:620(_reload_special_cases)
+       324400    0.055    0.000    0.103    0.000 doc.pyx:476(__iter__)
+       605575    0.103    0.000    0.103    0.000 model.py:105(layers)
+            2    0.000    0.000    0.102    0.051 tokenizer.pyx:133(__set__)
+         4089    0.085    0.000    0.100    0.000 tagger.pyx:158(set_annotations)
+       710238    0.100    0.000    0.100    0.000 token.pxd:21(cinit)
+       649236    0.082    0.000    0.098    0.000 {built-in method builtins.isinstance}
+         4149    0.098    0.000    0.098    0.000 tokenizer.pyx:576(_validate_special_case)
+         5211    0.040    0.000    0.096    0.000 doc.pyx:177(__init__)
+        40890    0.029    0.000    0.095    0.000 ops.py:448(reshape1f)
+        25687    0.026    0.000    0.092    0.000 doc.pyx:647(genexpr)
+         4089    0.006    0.000    0.089    0.000 tok2vec.py:256(get_batch_id)
+            7    0.003    0.000    0.085    0.012 language.py:2037(<lambda>)
+       286230    0.084    0.000    0.084    0.000 _param_server.py:45(get_param)
+        43813    0.084    0.000    0.084    0.000 {method 'to_dict' of 'spacy.tokens.morphanalysis.MorphAnalysis' objects}
+         4093    0.024    0.000    0.084    0.000 language.py:323(pipeline)
+            9    0.000    0.000    0.083    0.009 _json_api.py:42(read_json)
+        17132    0.079    0.000    0.081    0.000 tokenizer.pyx:556(find_suffix)
+         8178    0.021    0.000    0.079    0.000 ragged2list.py:18(forward)
+        40890    0.025    0.000    0.078    0.000 ops.py:454(reshape3f)
+        91470    0.036    0.000    0.078    0.000 lookups.py:109(get)
+            9    0.075    0.008    0.078    0.009 {built-in method srsly.ujson.ujson.load}
+         8178    0.010    0.000    0.078    0.000 tok2vec.py:261(<genexpr>)
+        40890    0.066    0.000    0.076    0.000 array_getitem.py:37(forward)
+        16356    0.017    0.000    0.075    0.000 <__array_function__ internals>:2(atleast_1d)
+    49081/49079    0.026    0.000    0.073    0.000 typing.py:755(__hash__)
+        40890    0.057    0.000    0.070    0.000 dropout.py:26(forward)
+       196327    0.068    0.000    0.068    0.000 model.py:168(get_dim)
+         3003    0.012    0.000    0.067    0.000 frame.py:3906(_box_col_values)
+         4089    0.063    0.000    0.066    0.000 attributeruler.py:152(<listcomp>)
+        98136    0.057    0.000    0.066    0.000 stringsource:999(memoryview_fromslice)
+        66159    0.021    0.000    0.063    0.000 {spacy.tokens._retokenize.set_token_attrs}
+         8178    0.005    0.000    0.063    0.000 staticvectors.py:44(<listcomp>)
+         4089    0.040    0.000    0.063    0.000 doc.pyx:752(set_ents)
+        40890    0.039    0.000    0.060    0.000 types.py:855(dataXd)
+       608344    0.059    0.000    0.059    0.000 {method 'append' of 'list' objects}
+            5    0.000    0.000    0.057    0.011 model.py:584(from_bytes)
+          134    0.000    0.000    0.056    0.000 _msgpack_api.py:17(msgpack_loads)
+            7    0.000    0.000    0.056    0.008 language.py:730(add_pipe)
+          134    0.000    0.000    0.056    0.000 __init__.py:70(unpackb)
+            7    0.000    0.000    0.056    0.008 language.py:617(create_pipe)
+         5211    0.014    0.000    0.056    0.000 _dict_proxies.py:25(__init__)
+        12299    0.052    0.000    0.053    0.000 tokenizer.pyx:528(find_infix)
+    437116/436794    0.050    0.000    0.053    0.000 {built-in method builtins.len}
+        21789    0.029    0.000    0.053    0.000 vocab.pyx:386(get_vector)
+           15    0.000    0.000    0.053    0.004 config.py:765(_make)
+        72/15    0.004    0.000    0.052    0.003 config.py:812(_fill)
+    123376/74298    0.033    0.000    0.050    0.000 {built-in method builtins.hash}
+        39610    0.050    0.000    0.050    0.000 {built-in method numpy.ascontiguousarray}
+        32712    0.017    0.000    0.049    0.000 {method 'get_error_handler' of 'spacy.pipeline.pipe.Pipe' objects}
+       630712    0.049    0.000    0.049    0.000 typing.py:1374(cast)
+         4089    0.039    0.000    0.048    0.000 arc_eager.pyx:743(set_annotations)
+       642943    0.046    0.000    0.046    0.000 {built-in method builtins.id}
+        88686    0.046    0.000    0.046    0.000 {built-in method builtins.hasattr}
+        16356    0.034    0.000    0.045    0.000 shape_base.py:23(atleast_1d)
+            5    0.001    0.000    0.044    0.009 model.py:605(from_dict)
+       319455    0.043    0.000    0.043    0.000 {method 'extend' of 'list' objects}
+          139    0.028    0.000    0.043    0.000 __init__.py:100(get_all)
+        66159    0.043    0.000    0.043    0.000 _retokenize.pyx:455(set_token_attrs)
+            3    0.000    0.000    0.042    0.014 {method 'from_disk' of 'spacy.pipeline.trainable_pipe.TrainablePipe' objects}
+            3    0.000    0.000    0.042    0.014 trainable_pipe.pyx:320(from_disk)
+         5211    0.009    0.000    0.042    0.000 __init__.py:1043(__init__)
+       212628    0.041    0.000    0.041    0.000 stringsource:345(__cinit__)
+            3    0.004    0.001    0.040    0.013 trainable_pipe.pyx:331(load_model)
+        24536    0.016    0.000    0.040    0.000 shape_base.py:218(_vhstack_dispatcher)
+         9312    0.002    0.000    0.039    0.000 vocab.pyx:162(get_by_orth)
+        49068    0.039    0.000    0.039    0.000 pipe.pyx:133(get_error_handler)
+           57    0.020    0.000    0.039    0.001 config.py:1030(make_promise_schema)
+       320154    0.038    0.000    0.039    0.000 {method 'add' of 'set' objects}
+          124    0.000    0.000    0.038    0.000 functools.py:883(wrapper)
+          124    0.000    0.000    0.038    0.000 model.py:799(deserialize_attr)
+         8180    0.009    0.000    0.037    0.000 <__array_function__ internals>:2(atleast_2d)
+         6459    0.026    0.000    0.036    0.000 lex_attrs.py:118(word_shape)
+         4114    0.019    0.000    0.036    0.000 errors.py:5(__getattribute__)
+       100702    0.035    0.000    0.035    0.000 {spacy.strings.get_string_id}
+         4089    0.003    0.000    0.035    0.000 nonproj.pyx:145(deprojectivize (wrapper))
+         3003    0.025    0.000    0.034    0.000 managers.py:1016(iget)
+         5211    0.011    0.000    0.033    0.000 _collections_abc.py:933(update)
+        16559    0.024    0.000    0.033    0.000 __init__.py:129(get_current_ops)
+         8178    0.012    0.000    0.033    0.000 concatenate.py:82(<listcomp>)
+         4089    0.029    0.000    0.033    0.000 nonproj.pyx:145(deprojectivize)
+        51937    0.022    0.000    0.031    0.000 util.py:66(get_array_module)
+            8    0.000    0.000    0.030    0.004 config.py:737(resolve)
+         8178    0.014    0.000    0.030    0.000 ops.py:531(asarray2i)
+        61073    0.022    0.000    0.029    0.000 tokenizer.pyx:359(_try_specials_and_cache)
+         4091    0.009    0.000    0.028    0.000 tok2vec.py:66(listeners)
+         3004    0.007    0.000    0.028    0.000 series.py:323(__init__)
+         6459    0.018    0.000    0.027    0.000 lex_attrs.py:22(like_num)
+         8178    0.019    0.000    0.026    0.000 tok2vec.py:286(forward)
+        17592    0.024    0.000    0.026    0.000 tokenizer.pyx:542(find_prefix)
+         8178    0.009    0.000    0.026    0.000 util.py:1070(get_cuda_stream)
+         3006    0.017    0.000    0.025    0.000 generic.py:5525(__finalize__)
+        39507    0.014    0.000    0.024    0.000 {built-in method builtins.any}
+        87433    0.024    0.000    0.024    0.000 lookups.py:220(get_table)
+        24536    0.012    0.000    0.024    0.000 shape_base.py:207(_arrays_for_stack_dispatcher)
+         4089    0.016    0.000    0.023    0.000 doc.pyx:101(values)
+       230290    0.023    0.000    0.023    0.000 {method 'get' of 'dict' objects}
+        49076    0.017    0.000    0.023    0.000 typing.py:573(__hash__)
+            7    0.000    0.000    0.022    0.003 config.py:751(fill)
+         8180    0.017    0.000    0.022    0.000 shape_base.py:81(atleast_2d)
+         1122    0.007    0.000    0.021    0.000 phrasematcher.pyx:156(add)
+        21789    0.020    0.000    0.021    0.000 vocab.pyx:430(has_vector)
+       196280    0.021    0.000    0.021    0.000 {built-in method numpy.asanyarray}
+            3    0.000    0.000    0.021    0.007 config.py:375(from_str)
+         3006    0.015    0.000    0.020    0.000 generic.py:239(__init__)
+       164649    0.020    0.000    0.020    0.000 {built-in method builtins.issubclass}
+         3006    0.008    0.000    0.020    0.000 indexing.py:2474(check_deprecated_indexers)
+         8245    0.020    0.000    0.020    0.000 util.py:425(partial)
+         4089    0.019    0.000    0.019    0.000 tagger.pyx:149(_scores2guesses)
+       406181    0.019    0.000    0.019    0.000 doc.pyx:42(bounds_check)
+         8457    0.019    0.000    0.019    0.000 {method 'format' of 'str' objects}
+    12120/6459    0.008    0.000    0.017    0.000 util.py:1147(_get_attr_unless_lookup)
+         4089    0.013    0.000    0.017    0.000 tok2vec.py:131(set_annotations)
+         3000    0.008    0.000    0.017    0.000 indexing.py:1419(_is_scalar_access)
+        81780    0.016    0.000    0.016    0.000 {built-in method numpy.core._multiarray_umath.normalize_axis_index}
+         6459    0.013    0.000    0.016    0.000 lex_attrs.py:90(like_url)
+       212628    0.016    0.000    0.016    0.000 stringsource:372(__dealloc__)
+       143930    0.016    0.000    0.016    0.000 {method 'lower' of 'str' objects}
+         1941    0.003    0.000    0.016    0.000 <__array_function__ internals>:2(dot)
+         6285    0.005    0.000    0.016    0.000 abc.py:117(__instancecheck__)
+            2    0.000    0.000    0.015    0.008 lookups.py:297(from_disk)
+        29951    0.006    0.000    0.015    0.000 {built-in method builtins.all}
+         6006    0.010    0.000    0.015    0.000 base.py:5023(__getitem__)
+        16356    0.014    0.000    0.014    0.000 {built-in method numpy.zeros}
+         4089    0.014    0.000    0.014    0.000 {method 'sort' of 'list' objects}
+          134    0.012    0.000    0.014    0.000 {srsly.msgpack._unpacker.unpackb}
+         4095    0.013    0.000    0.014    0.000 tok2vec.py:73(listening_components)
+         3003    0.003    0.000    0.014    0.000 series.py:1238(_set_as_cached)
+            2    0.000    0.000    0.013    0.007 config.py:448(from_disk)
+            2    0.002    0.001    0.013    0.007 lookups.py:267(from_bytes)
+         8178    0.013    0.000    0.013    0.000 tok2vec.py:263(receive)
+        36801    0.013    0.000    0.013    0.000 ops.py:240(<listcomp>)
+         8178    0.013    0.000    0.013    0.000 _beam_utils.pyx:199(collect_states)
+       147204    0.012    0.000    0.012    0.000 stringsource:663(memoryview_check)
+         4089    0.010    0.000    0.012    0.000 tokenizer.pyx:238(_apply_special_cases)
+        16356    0.006    0.000    0.012    0.000 staticvectors.py:39(<genexpr>)
+         4093    0.012    0.000    0.012    0.000 language.py:331(<listcomp>)
+         8178    0.004    0.000    0.012    0.000 doc.pyx:1587(set_children_from_heads)
+         3003    0.003    0.000    0.012    0.000 series.py:687(_values)
+           22    0.002    0.000    0.012    0.001 {built-in method io.open}
+            3    0.001    0.000    0.011    0.004 config.py:201(interpret_config)
+         4089    0.008    0.000    0.011    0.000 util.py:546(from_array)
+            1    0.000    0.000    0.011    0.011 config.py:193(interpolate)
+           20    0.000    0.000    0.011    0.001 pathlib.py:1246(open)
+         6285    0.011    0.000    0.011    0.000 {built-in method _abc._abc_instancecheck}
+         3010    0.011    0.000    0.011    0.000 generic.py:5585(__setattr__)
+        41748    0.011    0.000    0.011    0.000 {method 'startswith' of 'str' objects}
+       133842    0.010    0.000    0.010    0.000 doc.pyx:489(__len__)
+          399    0.000    0.000    0.010    0.000 inspect.py:3111(signature)
+          399    0.000    0.000    0.010    0.000 inspect.py:2859(from_callable)
+         8178    0.005    0.000    0.010    0.000 staticvectors.py:66(<listcomp>)
+         8377    0.010    0.000    0.010    0.000 _param_server.py:17(__init__)
+           20    0.000    0.000    0.010    0.000 pathlib.py:1118(_opener)
+           20    0.010    0.000    0.010    0.000 {built-in method nt.open}
+          399    0.002    0.000    0.010    0.000 inspect.py:2246(_signature_from_callable)
+        61341    0.009    0.000    0.009    0.000 multiarray.py:148(concatenate)
+         3003    0.008    0.000    0.009    0.000 managers.py:1848(internal_values)
+         6459    0.006    0.000    0.009    0.000 lex_attrs.py:33(is_ascii)
+            1    0.000    0.000    0.009    0.009 lemmatizer.py:289(from_disk)
+        62910    0.006    0.000    0.009    0.000 doc.pyx:897(__pyx_fuse_0push_back)
+            1    0.000    0.000    0.009    0.009 lemmatizer.py:302(<lambda>)
+        55304    0.009    0.000    0.009    0.000 util.py:100(is_cupy_array)
+        12267    0.007    0.000    0.009    0.000 with_array.py:74(<listcomp>)
+         9000    0.006    0.000    0.009    0.000 indexing.py:958(<genexpr>)
+        65424    0.008    0.000    0.008    0.000 stringsource:594(__get__)
+         4106    0.008    0.000    0.008    0.000 util.py:219(__init__)
+         1122    0.001    0.000    0.008    0.000 vocab.pyx:243(__getitem__)
+         4167    0.007    0.000    0.008    0.000 tokenizer.pyx:220(_flush_cache)
+         8180    0.008    0.000    0.008    0.000 doc.pyx:1620(_set_lr_kids_and_edges)
+            3    0.000    0.000    0.008    0.003 configparser.py:720(read_string)
+            3    0.000    0.000    0.008    0.003 configparser.py:705(read_file)
+            3    0.004    0.001    0.008    0.003 configparser.py:996(_read)
+         8180    0.008    0.000    0.008    0.000 numpy_ops.pyx:50(__init__)
+            1    0.000    0.000    0.008    0.008 language.py:2024(<lambda>)
+       121869    0.008    0.000    0.008    0.000 vocab.pyx:87(__get__)
+          211    0.004    0.000    0.008    0.000 {built-in method builtins.sorted}
+         8178    0.007    0.000    0.007    0.000 concatenate.py:56(<listcomp>)
+         6459    0.005    0.000    0.007    0.000 lex_attrs.py:26(is_punct)
+        54491    0.007    0.000    0.007    0.000 __init__.py:111(<genexpr>)
+       127412    0.007    0.000    0.007    0.000 vocab.pxd:28(__get__)
+        33118    0.007    0.000    0.007    0.000 {method 'get' of 'ContextVar' objects}
+         8178    0.004    0.000    0.007    0.000 tok2vec.py:121(<genexpr>)
+         5687    0.004    0.000    0.007    0.000 lookups.py:119(__contains__)
+        65424    0.007    0.000    0.007    0.000 stringsource:976(__dealloc__)
+         4091    0.006    0.000    0.007    0.000 tagger.pyx:113(labels)
+         4090    0.007    0.000    0.007    0.000 enum.py:443(__members__)
+       3455/5    0.003    0.000    0.006    0.001 util.py:294(convert_recursive)
+       219/20    0.000    0.000    0.006    0.000 util.py:315(<listcomp>)
+            1    0.000    0.000    0.006    0.006 util.py:629(load_config)
+            1    0.000    0.000    0.006    0.006 attributeruler.py:324(from_disk)
+            1    0.000    0.000    0.006    0.006 attributeruler.py:336(load_patterns)
+          399    0.002    0.000    0.006    0.000 inspect.py:2152(_signature_from_function)
+         5610    0.005    0.000    0.006    0.000 doc.pyx:405(has_annotation)
+         6459    0.003    0.000    0.006    0.000 lex_attrs.py:86(like_email)
+         8178    0.005    0.000    0.006    0.000 list2array.py:22(<listcomp>)
+        12871    0.004    0.000    0.006    0.000 lex_attrs.py:145(lower)
+         4089    0.006    0.000    0.006    0.000 dep_parser.pyx:294(__get__)
+         8178    0.004    0.000    0.005    0.000 list2ragged.py:25(<listcomp>)
+         8216    0.005    0.000    0.005    0.000 model.py:355(walk)
+         4091    0.005    0.000    0.005    0.000 tok2vec.py:71(<listcomp>)
+         3006    0.005    0.000    0.005    0.000 flags.py:47(__init__)
+         4089    0.004    0.000    0.005    0.000 tagger.pyx:137(genexpr)
+           38    0.000    0.000    0.005    0.000 config.py:310(copy)
+        18743    0.005    0.000    0.005    0.000 {built-in method builtins.setattr}
+     2678/206    0.002    0.000    0.004    0.000 copy.py:128(deepcopy)
+           15    0.000    0.000    0.004    0.000 config.py:322(merge)
+    1420/1050    0.001    0.000    0.004    0.000 configparser.py:765(get)
+            1    0.000    0.000    0.004    0.004 util.py:1248(from_bytes)
+            6    0.000    0.000    0.004    0.001 {built-in method builtins.next}
+         9000    0.003    0.000    0.004    0.000 indexing.py:957(<genexpr>)
+         9730    0.004    0.000    0.004    0.000 tokenizer.pyx:507(_save_cached)
+         6008    0.003    0.000    0.004    0.000 common.py:160(cast_scalar_indexer)
+            1    0.000    0.000    0.004    0.004 attributeruler.py:249(add_patterns)
+        65424    0.004    0.000    0.004    0.000 stringsource:559(__get__)
+         8358    0.004    0.000    0.004    0.000 model.py:157(has_dim)
+           18    0.002    0.000    0.004    0.000 tokenizer.pyx:230(_flush_specials)
+          180    0.000    0.000    0.004    0.000 attributeruler.py:225(add)
+        50122    0.004    0.000    0.004    0.000 {method 'isalpha' of 'str' objects}
+            2    0.000    0.000    0.004    0.002 parser.py:13(build_tb_parser_model)
+         8157    0.004    0.000    0.004    0.000 {method 'match' of 're.Pattern' objects}
+        16988    0.004    0.000    0.004    0.000 {method 'endswith' of 'str' objects}
+         3004    0.004    0.000    0.004    0.000 managers.py:1700(__init__)
+         9000    0.002    0.000    0.004    0.000 indexing.py:1432(<genexpr>)
+         4089    0.004    0.000    0.004    0.000 <string>:2(__init__)
+            4    0.000    0.000    0.004    0.001 lookups.py:64(__init__)
+           93    0.004    0.000    0.004    0.000 {method 'copy' of 'numpy.ndarray' objects}
+         6459    0.003    0.000    0.004    0.000 lex_attrs.py:78(is_currency)
+            4    0.001    0.000    0.004    0.001 {method 'update' of 'collections.OrderedDict' objects}
+          807    0.000    0.000    0.004    0.000 _collections_abc.py:849(__iter__)
+            4    0.000    0.000    0.004    0.001 __init__.py:118(use_ops)
+            2    0.000    0.000    0.004    0.002 contextlib.py:114(__enter__)
+          118    0.000    0.000    0.004    0.000 config.py:335(_sort)
+         6459    0.003    0.000    0.003    0.000 lex_attrs.py:181(is_stop)
+            2    0.000    0.000    0.003    0.002 __init__.py:88(get_ops)
+           38    0.000    0.000    0.003    0.000 copy.py:258(_reconstruct)
+         3006    0.003    0.000    0.003    0.000 flags.py:83(allows_duplicate_labels)
+         3001    0.003    0.000    0.003    0.000 indexing.py:130(iloc)
+           73    0.003    0.000    0.003    0.000 {built-in method nt.stat}
+        46427    0.003    0.000    0.003    0.000 {method 'isupper' of 'str' objects}
+        64985    0.003    0.000    0.003    0.000 trainable_pipe.pxd:5(__get__)
+      392/283    0.001    0.000    0.003    0.000 copy.py:226(_deepcopy_dict)
+         9003    0.002    0.000    0.003    0.000 indexing.py:2479(<genexpr>)
+          525    0.000    0.000    0.003    0.000 configparser.py:1255(__getitem__)
+         3002    0.003    0.000    0.003    0.000 generic.py:660(ndim)
+          114    0.000    0.000    0.003    0.000 config.py:159(__init__)
+            6    0.000    0.000    0.003    0.000 <frozen importlib._bootstrap>:1002(_find_and_load)
+         4405    0.002    0.000    0.003    0.000 data_classes.py:223(deserialize_transformer_data)
+            2    0.000    0.000    0.003    0.001 __init__.py:77(_import_extra_cpu_backends)
+        17067    0.003    0.000    0.003    0.000 {method 'items' of 'dict' objects}
+        19961    0.003    0.000    0.003    0.000 {method 'keys' of 'dict' objects}
+         8178    0.003    0.000    0.003    0.000 concatenate.py:83(<listcomp>)
+          645    0.001    0.000    0.003    0.000 config.py:343(<lambda>)
+         3003    0.003    0.000    0.003    0.000 blocks.py:358(iget)
+         3519    0.002    0.000    0.003    0.000 lookups.py:81(__setitem__)
+        42289    0.003    0.000    0.003    0.000 {built-in method builtins.ord}
+         6459    0.002    0.000    0.003    0.000 lex_attrs.py:157(is_alpha)
+         6005    0.002    0.000    0.003    0.000 common.py:346(apply_if_callable)
+            4    0.000    0.000    0.003    0.001 <frozen importlib._bootstrap>:967(_find_and_load_unlocked)
+            4    0.000    0.000    0.003    0.001 <frozen importlib._bootstrap>:901(_find_spec)
+           11    0.000    0.000    0.003    0.000 codecs.py:319(decode)
+            1    0.000    0.000    0.003    0.003 config.py:397(to_str)
+         9003    0.002    0.000    0.003    0.000 indexing.py:2490(<genexpr>)
+           11    0.002    0.000    0.002    0.000 {built-in method _codecs.utf_8_decode}
+            4    0.000    0.000    0.002    0.001 <frozen importlib._bootstrap_external>:1406(find_spec)
+            4    0.000    0.000    0.002    0.001 <frozen importlib._bootstrap_external>:1374(_get_spec)
+         6459    0.002    0.000    0.002    0.000 lex_attrs.py:165(is_lower)
+          419    0.002    0.000    0.002    0.000 doc.pyx:1003(_realloc)
+        16356    0.002    0.000    0.002    0.000 shape_base.py:19(_atleast_1d_dispatcher)
+        13368    0.002    0.000    0.002    0.000 {built-in method unicodedata.category}
+            3    0.000    0.000    0.002    0.001 trainable_pipe.pyx:340(lambda8)
+            3    0.000    0.000    0.002    0.001 pipe.pyx:145(deserialize_config)
+           36    0.000    0.000    0.002    0.000 <frozen importlib._bootstrap_external>:1505(find_spec)
+         6459    0.002    0.000    0.002    0.000 lex_attrs.py:161(is_digit)
+         6459    0.001    0.000    0.002    0.000 lex_attrs.py:173(is_title)
+         3455    0.001    0.000    0.002    0.000 util.py:95(is_xp_array)
+        13407    0.002    0.000    0.002    0.000 {method 'replace' of 'str' objects}
+        12012    0.002    0.000    0.002    0.000 {pandas._libs.lib.is_integer}
+           19    0.002    0.000    0.002    0.000 phrasematcher.pyx:31(__init__)
+         6459    0.002    0.000    0.002    0.000 lex_attrs.py:169(is_space)
+        35184    0.002    0.000    0.002    0.000 tokenizer.pyx:94(__get__)
+         6459    0.002    0.000    0.002    0.000 lex_attrs.py:59(is_quote)
+         6459    0.001    0.000    0.002    0.000 lex_attrs.py:177(is_upper)
+           30    0.000    0.000    0.002    0.000 pathlib.py:1227(stat)
+            3    0.000    0.000    0.002    0.001 tok2vec.py:266(MaxoutWindowEncoder)
+          180    0.002    0.000    0.002    0.000 {method 'add' of 'spacy.matcher.matcher.Matcher' objects}
+           28    0.000    0.000    0.002    0.000 pathlib.py:1419(exists)
+          826    0.001    0.000    0.002    0.000 inspect.py:2498(__init__)
+        162/3    0.001    0.000    0.002    0.001 config.py:247(replace_section_refs)
+          645    0.001    0.000    0.002    0.000 config.py:462(_mask_positional_args)
+         6459    0.002    0.000    0.002    0.000 lex_attrs.py:54(is_bracket)
+         6287    0.002    0.000    0.002    0.000 {method 'count' of 'str' objects}
+         8393    0.002    0.000    0.002    0.000 {method '__exit__' of '_thread.lock' objects}
+        34264    0.002    0.000    0.002    0.000 tokenizer.pyx:102(__get__)
+         4091    0.002    0.000    0.002    0.000 softmax.py:106(validate_temperature)
+          350    0.000    0.000    0.002    0.000 config.py:53(before_get)
+            8    0.000    0.000    0.002    0.000 util.py:1386(copy_config)
+         7677    0.002    0.000    0.002    0.000 {method 'join' of 'str' objects}
+            3    0.000    0.000    0.002    0.001 clone.py:13(clone)
+         3007    0.002    0.000    0.002    0.000 managers.py:156(blknos)
+         6459    0.002    0.000    0.002    0.000 lex_attrs.py:66(is_left_punct)
+          664    0.001    0.000    0.002    0.000 inspect.py:1878(_signature_is_functionlike)
+         56/7    0.000    0.000    0.002    0.000 model.py:459(copy)
+         6459    0.002    0.000    0.002    0.000 lex_attrs.py:153(suffix)
+         6008    0.002    0.000    0.002    0.000 {pandas._libs.lib.is_iterator}
+         8180    0.002    0.000    0.002    0.000 shape_base.py:77(_atleast_2d_dispatcher)
+          350    0.000    0.000    0.001    0.000 config.py:59(interpolate)
+         3006    0.001    0.000    0.001    0.000 generic.py:328(attrs)
+        16060    0.001    0.000    0.001    0.000 {method 'isdigit' of 'str' objects}
+            1    0.000    0.000    0.001    0.001 indexing.py:705(__setitem__)
+          456    0.001    0.000    0.001    0.000 inspect.py:2781(__init__)
+         6459    0.001    0.000    0.001    0.000 lex_attrs.py:73(is_right_punct)
+         56/7    0.000    0.000    0.001    0.000 model.py:476(<listcomp>)
+      642/525    0.000    0.000    0.001    0.000 config.py:262(_interpret_value)
+          180    0.000    0.000    0.001    0.000 {spacy.tokens._retokenize.normalize_token_attrs}
+          188    0.001    0.000    0.001    0.000 configparser.py:1243(__init__)
+         1420    0.001    0.000    0.001    0.000 configparser.py:1142(_unify_values)
+          285    0.001    0.000    0.001    0.000 functools.py:35(update_wrapper)
+         6459    0.001    0.000    0.001    0.000 lex_attrs.py:149(prefix)
+          180    0.001    0.000    0.001    0.000 _retokenize.pyx:439(normalize_token_attrs)
+            3    0.000    0.000    0.001    0.000 tok2vec.py:111(MultiHashEmbed)
+        22057    0.001    0.000    0.001    0.000 tokenizer.pyx:78(__get__)
+         2228    0.001    0.000    0.001    0.000 typing.py:1521(get_origin)
+           28    0.001    0.000    0.001    0.000 tokenizer.pyx:298(_prepare_special_spans)
+            1    0.000    0.000    0.001    0.001 indexing.py:638(_get_setitem_indexer)
+        16356    0.001    0.000    0.001    0.000 doc.pxd:44(__get__)
+         4089    0.001    0.000    0.001    0.000 dep_parser.pyx:340(_ensure_labels_are_added)
+        24598    0.001    0.000    0.001    0.000 tokenizer.pyx:110(__get__)
+         6012    0.001    0.000    0.001    0.000 generic.py:349(flags)
+         4089    0.001    0.000    0.001    0.000 doc.pxd:44(__set__)
+         1120    0.001    0.000    0.001    0.000 vocab.pyx:286(__get__)
+         8183    0.001    0.000    0.001    0.000 trainable_pipe.pxd:7(__get__)
+            1    0.000    0.000    0.001    0.001 util.py:849(get_model_meta)
+            1    0.000    0.000    0.001    0.001 util.py:806(load_meta)
+         8189    0.001    0.000    0.001    0.000 trainable_pipe.pxd:6(__get__)
+         3003    0.001    0.000    0.001    0.000 managers.py:1792(_block)
+         3006    0.001    0.000    0.001    0.000 flags.py:51(allows_duplicate_labels)
+         6459    0.001    0.000    0.001    0.000 vocab.pyx:208(_add_lex_to_vocab)
+          279    0.000    0.000    0.001    0.000 _collections_abc.py:805(__len__)
+            3    0.000    0.000    0.001    0.000 frame.py:3463(__getitem__)
+         6829    0.001    0.000    0.001    0.000 {built-in method builtins.getattr}
+          180    0.001    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:91(_path_join)
+           57    0.000    0.000    0.001    0.000 abc.py:105(__new__)
+        17216    0.001    0.000    0.001    0.000 tokenizer.pyx:86(__get__)
+         6009    0.001    0.000    0.001    0.000 {pandas._libs.lib.is_float}
+            1    0.000    0.000    0.001    0.001 language.py:2009(deserialize_meta)
+           36    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:135(_path_stat)
+            1    0.000    0.000    0.001    0.001 frame.py:3530(_getitem_bool_array)
+         4405    0.001    0.000    0.001    0.000 _msgpack_numpy.py:65(decode_numpy)
+         3006    0.001    0.000    0.001    0.000 managers.py:172(blklocs)
+            1    0.000    0.000    0.001    0.001 generic.py:3720(_take_with_is_copy)
+         4167    0.001    0.000    0.001    0.000 tokenizer.pyx:223(_reset_cache)
+         1398    0.001    0.000    0.001    0.000 <frozen importlib._bootstrap>:398(parent)
+          943    0.000    0.000    0.001    0.000 typing.py:847(__subclasscheck__)
+            1    0.001    0.001    0.001    0.001 util.py:1267(from_dict)
+            1    0.000    0.000    0.001    0.001 generic.py:3621(take)
+         3455    0.001    0.000    0.001    0.000 util.py:110(is_numpy_array)
+            3    0.000    0.000    0.001    0.000 configparser.py:1118(_join_multiline_values)
+           39    0.000    0.000    0.001    0.000 pathlib.py:974(__truediv__)
+            1    0.000    0.000    0.001    0.001 util.py:859(is_package)
+            1    0.000    0.000    0.001    0.001 metadata.py:527(distribution)
+            1    0.000    0.000    0.001    0.001 metadata.py:171(from_name)
+         6459    0.001    0.000    0.001    0.000 {method 'istitle' of 'str' objects}
+           39    0.000    0.000    0.001    0.000 pathlib.py:736(_make_child)
+          414    0.000    0.000    0.001    0.000 configparser.py:1278(_options)
+            1    0.000    0.000    0.001    0.001 indexing.py:668(_ensure_listlike_indexer)
+          887    0.001    0.000    0.001    0.000 enum.py:358(__call__)
+            8    0.000    0.000    0.001    0.000 __init__.py:893(<genexpr>)
+        10678    0.001    0.000    0.001    0.000 2466562680.py:31(<lambda>)
+         6459    0.001    0.000    0.001    0.000 {method 'islower' of 'str' objects}
+         1346    0.001    0.000    0.001    0.000 {built-in method fromkeys}
+          396    0.000    0.000    0.001    0.000 typing.py:718(__instancecheck__)
+         1420    0.001    0.000    0.001    0.000 __init__.py:935(__getitem__)
+          399    0.000    0.000    0.001    0.000 inspect.py:494(unwrap)
+            7    0.000    0.000    0.001    0.000 __init__.py:785(search)
+          174    0.001    0.000    0.001    0.000 {built-in method __new__ of type object at 0x00007FFCDDC9D670}
+          609    0.000    0.000    0.001    0.000 config.py:276(_get_section_ref)
+          642    0.000    0.000    0.001    0.000 config.py:476(try_load_json)
+         8178    0.001    0.000    0.001    0.000 doc.pxd:39(__get__)
+         5610    0.001    0.000    0.001    0.000 doc.pyx:441(genexpr)
+          276    0.000    0.000    0.001    0.000 configparser.py:1272(__len__)
+         7106    0.001    0.000    0.001    0.000 {built-in method builtins.callable}
+            3    0.000    0.000    0.001    0.000 managers.py:634(reindex_indexer)
+           86    0.000    0.000    0.001    0.000 util.py:122(get)
+         3519    0.001    0.000    0.001    0.000 {method 'add' of 'preshed.bloom.BloomFilter' objects}
+         1941    0.001    0.000    0.001    0.000 multiarray.py:736(dot)
+           46    0.000    0.000    0.001    0.000 chain.py:20(chain)
+           41    0.000    0.000    0.001    0.000 pathlib.py:682(_parse_args)
+          819    0.000    0.000    0.001    0.000 _json_api.py:30(json_loads)
+         6461    0.001    0.000    0.001    0.000 lex_attrs.py:185(get_lang)
+            4    0.000    0.000    0.001    0.000 config.py:143(get_configparser)
+            1    0.000    0.000    0.001    0.001 language.py:1650(_link_components)
+            3    0.000    0.000    0.001    0.000 tok2vec.py:159(<listcomp>)
+         6459    0.001    0.000    0.001    0.000 {method 'isspace' of 'str' objects}
+           72    0.000    0.000    0.001    0.000 config.py:936(_update_from_parsed)
+           15    0.000    0.000    0.001    0.000 tok2vec.py:154(make_hash_embed)
+          414    0.000    0.000    0.001    0.000 configparser.py:670(options)
+            4    0.000    0.000    0.001    0.000 configparser.py:601(__init__)
+            1    0.000    0.000    0.001    0.001 generic.py:5654(_consolidate_inplace)
+            1    0.000    0.000    0.001    0.001 generic.py:5640(_protect_consolidate)
+           15    0.000    0.000    0.001    0.000 hashembed.py:16(HashEmbed)
+           87    0.000    0.000    0.001    0.000 __init__.py:81(get)
+            1    0.000    0.000    0.001    0.001 generic.py:5658(f)
+          175    0.000    0.000    0.001    0.000 configparser.py:1200(set)
+            2    0.000    0.000    0.001    0.000 managers.py:875(take)
+         1122    0.000    0.000    0.001    0.000 phrasematcher.pyx:338(_convert_to_array)
+            1    0.000    0.000    0.001    0.001 managers.py:618(consolidate)
+          258    0.000    0.000    0.001    0.000 model.py:179(set_dim)
+      417/243    0.000    0.000    0.001    0.000 typing.py:285(_eval_type)
+            1    0.000    0.000    0.001    0.001 managers.py:1683(_consolidate_inplace)
+           12    0.000    0.000    0.000    0.000 typing.py:1140(__instancecheck__)
+            1    0.000    0.000    0.000    0.000 managers.py:2074(_consolidate)
+            7    0.000    0.000    0.000    0.000 __init__.py:788(mtime)
+         1420    0.000    0.000    0.000    0.000 __init__.py:925(__init__)
+            4    0.000    0.000    0.000    0.000 configparser.py:1320(__init__)
+          333    0.000    0.000    0.000    0.000 config.py:993(is_promise)
+         4086    0.000    0.000    0.000    0.000 {method 'strip' of 'str' objects}
+            1    0.000    0.000    0.000    0.000 indexing.py:787(_convert_tuple)
+            2    0.000    0.000    0.000    0.000 indexing.py:1223(_convert_to_indexer)
+            2    0.000    0.000    0.000    0.000 managers.py:692(<listcomp>)
+            4    0.000    0.000    0.000    0.000 base.py:3706(get_indexer)
+          955    0.000    0.000    0.000    0.000 {method 'search' of 're.Pattern' objects}
+           15    0.000    0.000    0.000    0.000 {method '__exit__' of '_io._IOBase' objects}
+            1    0.000    0.000    0.000    0.000 configparser.py:905(write)
+            1    0.000    0.000    0.000    0.000 base.py:3058(union)
+          175    0.000    0.000    0.000    0.000 config.py:484(try_dump_json)
+            1    0.000    0.000    0.000    0.000 indexing.py:1301(_get_listlike_indexer)
+            1    0.000    0.000    0.000    0.000 base.py:5768(_get_indexer_strict)
+           11    0.000    0.000    0.000    0.000 util.py:20(force_path)
+            5    0.000    0.000    0.000    0.000 managers.py:2091(_merge_blocks)
+        63/15    0.000    0.000    0.000    0.000 config.py:505(deep_merge_configs)
+            1    0.000    0.000    0.000    0.000 _decorators.py:302(wrapper)
+           28    0.000    0.000    0.000    0.000 tokenizer.pyx:318(_retokenize_special_spans)
+           41    0.000    0.000    0.000    0.000 pathlib.py:64(parse_parts)
+            1    0.000    0.000    0.000    0.000 frame.py:6263(sort_values)
+          819    0.000    0.000    0.000    0.000 {built-in method srsly.ujson.ujson.loads}
+          187    0.000    0.000    0.000    0.000 _json_api.py:10(json_dumps)
+           46    0.000    0.000    0.000    0.000 configparser.py:1206(add_section)
+          114    0.000    0.000    0.000    0.000 config.py:1005(get_constructor)
+            6    0.000    0.000    0.000    0.000 {method 'read' of '_io.BufferedReader' objects}
+           18    0.000    0.000    0.000    0.000 nonproj.pyx:208(_find_new_head)
+          511    0.000    0.000    0.000    0.000 copy.py:242(_keep_alive)
+         1787    0.000    0.000    0.000    0.000 {method 'split' of 'str' objects}
+         4149    0.000    0.000    0.000    0.000 tokenizer.pyx:130(__get__)
+            1    0.000    0.000    0.000    0.000 format.py:570(_read_array_header)
+           10    0.000    0.000    0.000    0.000 blocks.py:1098(take_nd)
+            3    0.000    0.000    0.000    0.000 tokenizer.pyx:97(__set__)
+           46    0.000    0.000    0.000    0.000 configparser.py:925(_write_section)
+           24    0.000    0.000    0.000    0.000 typing.py:1064(_get_protocol_attrs)
+           33    0.000    0.000    0.000    0.000 config.py:273(<listcomp>)
+        14/12    0.000    0.000    0.000    0.000 take.py:57(take_nd)
+            1    0.000    0.000    0.000    0.000 base.py:87(reindex_axis)
+            6    0.000    0.000    0.000    0.000 maxout.py:17(Maxout)
+           46    0.000    0.000    0.000    0.000 configparser.py:649(add_section)
+          243    0.000    0.000    0.000    0.000 dataclasses.py:1047(is_dataclass)
+           21    0.000    0.000    0.000    0.000 config.py:662(copy_model_field)
+           81    0.000    0.000    0.000    0.000 copy.py:200(_deepcopy_list)
+          175    0.000    0.000    0.000    0.000 configparser.py:891(set)
+          795    0.000    0.000    0.000    0.000 {method 'group' of 're.Match' objects}
+          138    0.000    0.000    0.000    0.000 configparser.py:1275(__iter__)
+         1438    0.000    0.000    0.000    0.000 {method 'rpartition' of 'str' objects}
+          525    0.000    0.000    0.000    0.000 configparser.py:877(has_option)
+            3    0.000    0.000    0.000    0.000 tokenizer.pyx:89(__set__)
+          173    0.000    0.000    0.000    0.000 {built-in method srsly.ujson.ujson.dumps}
+            3    0.000    0.000    0.000    0.000 tokenizer.pyx:105(__set__)
+          175    0.000    0.000    0.000    0.000 config.py:42(before_read)
+            3    0.000    0.000    0.000    0.000 tokenizer.pyx:113(__set__)
+           32    0.000    0.000    0.000    0.000 re.py:250(compile)
+          4/3    0.000    0.000    0.000    0.000 base.py:397(__new__)
+           33    0.000    0.000    0.000    0.000 config.py:256(<listcomp>)
+           37    0.000    0.000    0.000    0.000 re.py:289(_compile)
+           87    0.000    0.000    0.000    0.000 __init__.py:176(_get)
+         1065    0.000    0.000    0.000    0.000 {method 'update' of 'dict' objects}
+           57    0.000    0.000    0.000    0.000 {built-in method _abc._abc_init}
+            1    0.000    0.000    0.000    0.000 util.py:691(is_compatible_version)
+            2    0.000    0.000    0.000    0.000 base.py:4109(reindex)
+           73    0.000    0.000    0.000    0.000 pathlib.py:752(__fspath__)
+          798    0.000    0.000    0.000    0.000 inspect.py:159(isfunction)
+            1    0.000    0.000    0.000    0.000 format.py:535(_filter_header)
+      278/180    0.000    0.000    0.000    0.000 typing.py:294(<genexpr>)
+           12    0.000    0.000    0.000    0.000 typing.py:1081(_is_callable_members_only)
+            2    0.000    0.000    0.000    0.000 tokenizer.pyx:81(__set__)
+            1    0.000    0.000    0.000    0.000 managers.py:713(_slice_take_blocks_ax0)
+            2    0.000    0.000    0.000    0.000 __init__.py:794(lookup)
+            2    0.000    0.000    0.000    0.000 __init__.py:800(__init__)
+            4    0.000    0.000    0.000    0.000 {built-in method builtins.dir}
+            1    0.000    0.000    0.000    0.000 base.py:3189(_union)
+           96    0.000    0.000    0.000    0.000 typing.py:705(__getattr__)
+          125    0.000    0.000    0.000    0.000 config.py:1000(<listcomp>)
+            2    0.000    0.000    0.000    0.000 specifiers.py:621(__init__)
+            7    0.000    0.000    0.000    0.000 base.py:6987(ensure_index)
+           57    0.000    0.000    0.000    0.000 config.py:1016(parse_args)
+          313    0.000    0.000    0.000    0.000 abc.py:121(__subclasscheck__)
+            2    0.000    0.000    0.000    0.000 base.py:672(_with_infer)
+          114    0.000    0.000    0.000    0.000 config.py:1007(<listcomp>)
+           75    0.000    0.000    0.000    0.000 pathlib.py:742(__str__)
+            3    0.000    0.000    0.000    0.000 warnings.py:130(filterwarnings)
+           28    0.000    0.000    0.000    0.000 util.py:174(has)
+           12    0.000    0.000    0.000    0.000 take.py:120(_take_nd_ndarray)
+            1    0.000    0.000    0.000    0.000 base.py:5744(get_indexer_for)
+           30    0.000    0.000    0.000    0.000 model.py:279(set_ref)
+          664    0.000    0.000    0.000    0.000 inspect.py:73(isclass)
+          887    0.000    0.000    0.000    0.000 enum.py:670(__new__)
+           57    0.000    0.000    0.000    0.000 inspect.py:2564(replace)
+            5    0.000    0.000    0.000    0.000 tok2vec.py:97(find_listeners)
+            9    0.000    0.000    0.000    0.000 version.py:261(__init__)
+            7    0.000    0.000    0.000    0.000 {built-in method builtins.compile}
+            1    0.000    0.000    0.000    0.000 common.py:55(new_method)
+            1    0.000    0.000    0.000    0.000 language.py:203(meta)
+            1    0.000    0.000    0.000    0.000 base.py:3560(_convert_can_do_setop)
+            2    0.000    0.000    0.000    0.000 __init__.py:771(children)
+            1    0.000    0.000    0.000    0.000 arraylike.py:58(__ge__)
+           21    0.000    0.000    0.000    0.000 tokenize.py:429(_tokenize)
+          139    0.000    0.000    0.000    0.000 __init__.py:117(get_entry_points)
+          175    0.000    0.000    0.000    0.000 configparser.py:459(before_set)
+            1    0.000    0.000    0.000    0.000 series.py:5613(_cmp_method)
+            1    0.000    0.000    0.000    0.000 indexing.py:1553(_setitem_with_indexer)
+          399    0.000    0.000    0.000    0.000 inspect.py:514(_is_wrapper)
+            4    0.000    0.000    0.000    0.000 specifiers.py:124(__hash__)
+           63    0.000    0.000    0.000    0.000 util.py:1204(normalize_slice)
+           88    0.000    0.000    0.000    0.000 __init__.py:127(get_entry_point)
+            4    0.000    0.000    0.000    0.000 specifiers.py:120(_canonical_spec)
+           22    0.000    0.000    0.000    0.000 __init__.py:183(dumps)
+            1    0.000    0.000    0.000    0.000 indexing.py:1692(_setitem_with_indexer_split_path)
+         1592    0.000    0.000    0.000    0.000 {method 'rstrip' of 'str' objects}
+            4    0.000    0.000    0.000    0.000 utils.py:38(canonicalize_version)
+            1    0.000    0.000    0.000    0.000 language.py:245(config)
+         2167    0.000    0.000    0.000    0.000 copy.py:182(_deepcopy_atomic)
+            2    0.000    0.000    0.000    0.000 tagger.py:9(build_tagger_model)
+            6    0.000    0.000    0.000    0.000 typing.py:524(__init__)
+            2    0.000    0.000    0.000    0.000 {method 'read' of '_io.TextIOWrapper' objects}
+           50    0.000    0.000    0.000    0.000 __init__.py:42(__contains__)
+           11    0.000    0.000    0.000    0.000 with_array.py:12(with_array)
+          285    0.000    0.000    0.000    0.000 functools.py:65(wraps)
+            8    0.000    0.000    0.000    0.000 _json_api.py:142(is_json_serializable)
+          138    0.000    0.000    0.000    0.000 typing.py:1544(get_args)
+          221    0.000    0.000    0.000    0.000 configparser.py:1169(_validate_value_types)
+           88    0.000    0.000    0.000    0.000 model.py:225(set_param)
+            1    0.000    0.000    0.000    0.000 indexing.py:1848(_setitem_single_column)
+         1312    0.000    0.000    0.000    0.000 inspect.py:2548(name)
+            2    0.000    0.000    0.000    0.000 _mixins.py:147(take)
+          313    0.000    0.000    0.000    0.000 {built-in method _abc._abc_subclasscheck}
+            4    0.000    0.000    0.000    0.000 base.py:6293(_maybe_cast_listlike_indexer)
+           15    0.000    0.000    0.000    0.000 array_getitem.py:29(ints_getitem)
+          124    0.000    0.000    0.000    0.000 functools.py:817(dispatch)
+            2    0.000    0.000    0.000    0.000 __init__.py:109(import_module)
+            6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:156(__enter__)
+           10    0.000    0.000    0.000    0.000 language.py:313(component_names)
+          838    0.000    0.000    0.000    0.000 {method 'isidentifier' of 'str' objects}
+          180    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:114(<listcomp>)
+            5    0.000    0.000    0.000    0.000 algorithms.py:1352(take)
+         1023    0.000    0.000    0.000    0.000 inspect.py:2560(kind)
+            5    0.000    0.000    0.000    0.000 {pandas._libs.lib.maybe_convert_objects}
+            2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1018(_gcd_import)
+           56    0.000    0.000    0.000    0.000 model.py:128(grad_names)
+           41    0.000    0.000    0.000    0.000 pathlib.py:715(_from_parsed_parts)
+            1    0.000    0.000    0.000    0.000 sre_compile.py:759(compile)
+          180    0.000    0.000    0.000    0.000 {method 'add' of 'spacy.strings.StringStore' objects}
+            4    0.000    0.000    0.000    0.000 __init__.py:136(set_current_ops)
+           96    0.000    0.000    0.000    0.000 typing.py:664(_is_dunder)
+            3    0.000    0.000    0.000    0.000 base.py:7106(_maybe_cast_data_without_dtype)
+          477    0.000    0.000    0.000    0.000 doc.pyx:897(__pyx_fuse_1push_back)
+          350    0.000    0.000    0.000    0.000 {method 'find' of 'str' objects}
+            8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:166(_get_module_lock)
+            4    0.000    0.000    0.000    0.000 blocks.py:2014(new_block_2d)
+           22    0.000    0.000    0.000    0.000 encoder.py:182(encode)
+            3    0.000    0.000    0.000    0.000 tok2vec.py:90(build_Tok2Vec_model)
+          798    0.000    0.000    0.000    0.000 configparser.py:1023(<dictcomp>)
+           10    0.000    0.000    0.000    0.000 base.py:5178(equals)
+           57    0.000    0.000    0.000    0.000 config.py:1042(<listcomp>)
+          141    0.000    0.000    0.000    0.000 _collections_abc.py:779(items)
+            1    0.000    0.000    0.000    0.000 util.py:717(is_unconstrained_version)
+          348    0.000    0.000    0.000    0.000 __init__.py:183(<genexpr>)
+           51    0.000    0.000    0.000    0.000 pathlib.py:155(splitroot)
+            1    0.000    0.000    0.000    0.000 series.py:2988(_construct_result)
+            1    0.000    0.000    0.000    0.000 specifiers.py:719(__contains__)
+          476    0.000    0.000    0.000    0.000 model.py:186(<genexpr>)
+            1    0.000    0.000    0.000    0.000 {built-in method numpy.array}
+            1    0.000    0.000    0.000    0.000 specifiers.py:722(contains)
+            4    0.000    0.000    0.000    0.000 base.py:6004(_should_compare)
+            2    0.000    0.000    0.000    0.000 pathlib.py:1079(__new__)
+           88    0.000    0.000    0.000    0.000 {built-in method numpy.frombuffer}
+          188    0.000    0.000    0.000    0.000 configparser.py:1362(__iter__)
+            6    0.000    0.000    0.000    0.000 concatenate.py:15(concatenate)
+          227    0.000    0.000    0.000    0.000 inspect.py:2830(<genexpr>)
+          414    0.000    0.000    0.000    0.000 {method 'copy' of 'dict' objects}
+            5    0.000    0.000    0.000    0.000 blocks.py:1944(maybe_coerce_values)
+            3    0.000    0.000    0.000    0.000 specifiers.py:749(<genexpr>)
+           31    0.000    0.000    0.000    0.000 pathlib.py:725(_format_parsed_parts)
+          141    0.000    0.000    0.000    0.000 config.py:208(<lambda>)
+           53    0.000    0.000    0.000    0.000 config.py:523(<listcomp>)
+            2    0.000    0.000    0.000    0.000 {built-in method nt.listdir}
+           76    0.000    0.000    0.000    0.000 copy.py:263(<genexpr>)
+            2    0.000    0.000    0.000    0.000 specifiers.py:168(contains)
+            1    0.000    0.000    0.000    0.000 generic.py:1804(_get_label_or_level_values)
+            3    0.000    0.000    0.000    0.000 list2ragged.py:12(list2ragged)
+            1    0.000    0.000    0.000    0.000 utils.py:959(safe_eval)
+           13    0.000    0.000    0.000    0.000 construction.py:438(ensure_wrapped_if_datetimelike)
+          134    0.000    0.000    0.000    0.000 {method 'rsplit' of 'str' objects}
+            2    0.000    0.000    0.000    0.000 pathlib.py:702(_from_parts)
+           10    0.000    0.000    0.000    0.000 blocks.py:238(fill_value)
+            2    0.000    0.000    0.000    0.000 pathlib.py:1450(is_file)
+            4    0.000    0.000    0.000    0.000 util.py:523(set_torch_tensor_type_for_ops)
+            1    0.000    0.000    0.000    0.000 ast.py:54(literal_eval)
+           16    0.000    0.000    0.000    0.000 missing.py:571(na_value_for_dtype)
+            1    0.000    0.000    0.000    0.000 __init__.py:778(zip_children)
+            2    0.000    0.000    0.000    0.000 frame.py:3923(_get_item_cache)
+          663    0.000    0.000    0.000    0.000 {method 'start' of 're.Match' objects}
+            1    0.000    0.000    0.000    0.000 __init__.py:188(load)
+            1    0.000    0.000    0.000    0.000 zipp.py:230(__init__)
+            1    0.000    0.000    0.000    0.000 {spacy.vocab.create_vocab}
+            7    0.000    0.000    0.000    0.000 blocks.py:332(getitem_block_columns)
+          141    0.000    0.000    0.000    0.000 configparser.py:961(__getitem__)
+          243    0.000    0.000    0.000    0.000 config.py:651(alias_generator)
+            1    0.000    0.000    0.000    0.000 zipp.py:100(make)
+            2    0.000    0.000    0.000    0.000 specifiers.py:290(wrapped)
+           16    0.000    0.000    0.000    0.000 managers.py:2079(<lambda>)
+            1    0.000    0.000    0.000    0.000 datetimes.py:337(_from_sequence)
+            1    0.000    0.000    0.000    0.000 vocab.pyx:26(create_vocab)
+            1    0.000    0.000    0.000    0.000 frame.py:3812(_iset_item)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:937(parse)
+           38    0.000    0.000    0.000    0.000 {method '__reduce_ex__' of 'object' objects}
+            1    0.000    0.000    0.000    0.000 util.py:1101(compile_prefix_regex)
+            8    0.000    0.000    0.000    0.000 base.py:2272(is_boolean)
+          180    0.000    0.000    0.000    0.000 {method 'sub' of 're.Pattern' objects}
+            1    0.000    0.000    0.000    0.000 datetimes.py:341(_from_sequence_not_strict)
+           36    0.000    0.000    0.000    0.000 typing.py:1148(<genexpr>)
+           49    0.000    0.000    0.000    0.000 config.py:525(<listcomp>)
+          124    0.000    0.000    0.000    0.000 weakref.py:415(__getitem__)
+            1    0.000    0.000    0.000    0.000 util.py:1112(compile_suffix_regex)
+           25    0.000    0.000    0.000    0.000 base.py:286(is_dtype)
+           16    0.000    0.000    0.000    0.000 cast.py:468(maybe_promote)
+           12    0.000    0.000    0.000    0.000 take.py:554(_take_preprocess_indexer_and_fill_value)
+           51    0.000    0.000    0.000    0.000 common.py:1587(_is_dtype_type)
+            8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:58(__init__)
+            4    0.000    0.000    0.000    0.000 base.py:3786(_get_indexer)
+          112    0.000    0.000    0.000    0.000 model.py:123(param_names)
+           19    0.000    0.000    0.000    0.000 encoder.py:204(iterencode)
+           13    0.000    0.000    0.000    0.000 _dtype.py:321(_name_get)
+            5    0.000    0.000    0.000    0.000 base.py:2596(inferred_type)
+          161    0.000    0.000    0.000    0.000 generic.py:43(_check)
+            8    0.000    0.000    0.000    0.000 blocks.py:166(_consolidate_key)
+            7    0.000    0.000    0.000    0.000 blocks.py:310(_slice)
+          137    0.000    0.000    0.000    0.000 {built-in method builtins.max}
+            3    0.000    0.000    0.000    0.000 construction.py:470(sanitize_array)
+          570    0.000    0.000    0.000    0.000 inspect.py:2552(default)
+            4    0.000    0.000    0.000    0.000 {built-in method from_error_rate}
+            1    0.000    0.000    0.000    0.000 zipfile.py:1206(__init__)
+            1    0.000    0.000    0.000    0.000 sorting.py:357(nargsort)
+            1    0.000    0.000    0.000    0.000 ast.py:33(parse)
+          590    0.000    0.000    0.000    0.000 {method 'values' of 'dict' objects}
+           17    0.000    0.000    0.000    0.000 common.py:497(is_categorical_dtype)
+            1    0.000    0.000    0.000    0.000 vocab.pyx:53(__init__)
+          700    0.000    0.000    0.000    0.000 configparser.py:363(before_get)
+            5    0.000    0.000    0.000    0.000 {pandas._libs.lib.infer_dtype}
+            6    0.000    0.000    0.000    0.000 dropout.py:12(Dropout)
+            3    0.000    0.000    0.000    0.000 base.py:1098(take)
+          399    0.000    0.000    0.000    0.000 {built-in method sys.getrecursionlimit}
+            6    0.000    0.000    0.000    0.000 typing.py:539(_evaluate)
+            7    0.000    0.000    0.000    0.000 __init__.py:821(search)
+            1    0.000    0.000    0.000    0.000 language.py:354(pipe_labels)
+           25    0.000    0.000    0.000    0.000 common.py:161(is_object_dtype)
+            1    0.000    0.000    0.000    0.000 generic.py:3734(xs)
+            7    0.000    0.000    0.000    0.000 language.py:804(_get_pipe_index)
+            2    0.000    0.000    0.000    0.000 datetimelike.py:330(__getitem__)
+            1    0.000    0.000    0.000    0.000 contextlib.py:489(__exit__)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:435(_parse_sub)
+            6    0.000    0.000    0.000    0.000 layernorm.py:13(LayerNorm)
+           88    0.000    0.000    0.000    0.000 _param_server.py:55(set_param)
+            4    0.000    0.000    0.000    0.000 __init__.py:300(set_default_tensor_type)
+            1    0.000    0.000    0.000    0.000 datetimes.py:1994(_sequence_to_dt64ns)
+            4    0.000    0.000    0.000    0.000 linear.py:14(Linear)
+           19    0.000    0.000    0.000    0.000 tokenize.py:98(_compile)
+            6    0.000    0.000    0.000    0.000 cast.py:515(_maybe_promote)
+            2    0.000    0.000    0.000    0.000 tok2vec.py:17(tok2vec_listener_v1)
+            1    0.000    0.000    0.000    0.000 util.py:1108(<listcomp>)
+            1    0.000    0.000    0.000    0.000 specifiers.py:481(_compare_greater_than_equal)
+           16    0.000    0.000    0.000    0.000 {built-in method _thread.allocate_lock}
+            1    0.000    0.000    0.000    0.000 tokenize.py:257(untokenize)
+            4    0.000    0.000    0.000    0.000 base.py:3823(_check_indexing_method)
+            1    0.000    0.000    0.000    0.000 util.py:750(get_minor_version_range)
+          399    0.000    0.000    0.000    0.000 inspect.py:2865(parameters)
+           14    0.000    0.000    0.000    0.000 language.py:370(has_factory)
+            2    0.000    0.000    0.000    0.000 parser.py:101(resize_output)
+            2    0.000    0.000    0.000    0.000 tok2vec.py:240(__init__)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:493(_parse)
+           11    0.000    0.000    0.000    0.000 codecs.py:309(__init__)
+            1    0.000    0.000    0.000    0.000 tokenize.py:183(untokenize)
+           20    0.000    0.000    0.000    0.000 util.py:358(ensure_path)
+           26    0.000    0.000    0.000    0.000 lookups.py:100(__getitem__)
+           19    0.000    0.000    0.000    0.000 common.py:581(is_dtype_equal)
+            1    0.000    0.000    0.000    0.000 util.py:1119(<listcomp>)
+           87    0.000    0.000    0.000    0.000 __init__.py:167(check_exists)
+            1    0.000    0.000    0.000    0.000 array_ops.py:227(comparison_op)
+            1    0.000    0.000    0.000    0.000 indexing.py:2345(check_bool_indexer)
+          205    0.000    0.000    0.000    0.000 {method 'setdefault' of 'dict' objects}
+           56    0.000    0.000    0.000    0.000 model.py:131(<listcomp>)
+            3    0.000    0.000    0.000    0.000 expand_window.py:11(expand_window)
+            2    0.000    0.000    0.000    0.000 parser.py:107(_resize_upper)
+          118    0.000    0.000    0.000    0.000 config.py:342(<dictcomp>)
+          180    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:231(_verbose_message)
+            1    0.000    0.000    0.000    0.000 sre_compile.py:598(_code)
+          368    0.000    0.000    0.000    0.000 inspect.py:2556(annotation)
+           58    0.000    0.000    0.000    0.000 {built-in method sys.intern}
+            1    0.000    0.000    0.000    0.000 __init__.py:877(find_distributions)
+           14    0.000    0.000    0.000    0.000 common.py:1240(is_float_dtype)
+            3    0.000    0.000    0.000    0.000 base.py:2232(is_unique)
+          267    0.000    0.000    0.000    0.000 {method 'write' of '_io.StringIO' objects}
+            1    0.000    0.000    0.000    0.000 frame.py:3790(_iset_item_mgr)
+            9    0.000    0.000    0.000    0.000 {method 'max' of 'numpy.ndarray' objects}
+            2    0.000    0.000    0.000    0.000 utils.py:249(maybe_convert_indices)
+            2    0.000    0.000    0.000    0.000 parser.py:93(_define_upper)
+          525    0.000    0.000    0.000    0.000 configparser.py:369(before_read)
+            7    0.000    0.000    0.000    0.000 base.py:53(shape)
+            9    0.000    0.000    0.000    0.000 version.py:444(_cmpkey)
+            3    0.000    0.000    0.000    0.000 staticvectors.py:13(StaticVectors)
+            2    0.000    0.000    0.000    0.000 {method '_rebuild_blknos_and_blklocs' of 'pandas._libs.internals.BlockManager' objects}
+            5    0.000    0.000    0.000    0.000 numeric.py:289(full)
+            5    0.000    0.000    0.000    0.000 common.py:229(asarray_tuplesafe)
+            2    0.000    0.000    0.000    0.000 contextlib.py:123(__exit__)
+            3    0.000    0.000    0.000    0.000 utils.py:457(check_array_indexer)
+          130    0.000    0.000    0.000    0.000 {built-in method builtins.min}
+            3    0.000    0.000    0.000    0.000 common.py:105(is_bool_indexer)
+            4    0.000    0.000    0.000    0.000 specifiers.py:95(__init__)
+            1    0.000    0.000    0.000    0.000 managers.py:849(_make_na_block)
+            2    0.000    0.000    0.000    0.000 ntpath.py:214(basename)
+           43    0.000    0.000    0.000    0.000 typing.py:927(__eq__)
+           21    0.000    0.000    0.000    0.000 __init__.py:581(__init__)
+            4    0.000    0.000    0.000    0.000 {method 'get_indexer' of 'pandas._libs.index.IndexEngine' objects}
+            1    0.000    0.000    0.000    0.000 __init__.py:889(_search_paths)
+           14    0.000    0.000    0.000    0.000 language.py:387(get_factory_meta)
+            3    0.000    0.000    0.000    0.000 residual.py:13(residual)
+           11    0.000    0.000    0.000    0.000 with_array.py:24(<dictcomp>)
+          193    0.000    0.000    0.000    0.000 {built-in method builtins.iter}
+          184    0.000    0.000    0.000    0.000 configparser.py:663(has_section)
+          188    0.000    0.000    0.000    0.000 configparser.py:1190(converters)
+            9    0.000    0.000    0.000    0.000 _methods.py:38(_amax)
+           40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1337(_path_importer_cache)
+            1    0.000    0.000    0.000    0.000 managers.py:1061(iset)
+           70    0.000    0.000    0.000    0.000 {method 'insert' of 'list' objects}
+            2    0.000    0.000    0.000    0.000 ntpath.py:180(split)
+            1    0.000    0.000    0.000    0.000 dep_parser.pyx:60(make_parser)
+           38    0.000    0.000    0.000    0.000 copyreg.py:94(__newobj__)
+           10    0.000    0.000    0.000    0.000 missing.py:66(isna)
+            5    0.000    0.000    0.000    0.000 re.py:203(sub)
+            3    0.000    0.000    0.000    0.000 featureextractor.py:8(FeatureExtractor)
+            2    0.000    0.000    0.000    0.000 softmax.py:32(Softmax_v2)
+            8    0.000    0.000    0.000    0.000 missing.py:625(is_valid_na_for_dtype)
+          141    0.000    0.000    0.000    0.000 _collections_abc.py:802(__init__)
+            7    0.000    0.000    0.000    0.000 {method 'any' of 'numpy.ndarray' objects}
+            3    0.000    0.000    0.000    0.000 base.py:554(_dtype_to_subclass)
+            1    0.000    0.000    0.000    0.000 ner.pyx:50(make_ner)
+            2    0.000    0.000    0.000    0.000 _mixins.py:266(__getitem__)
+            1    0.000    0.000    0.000    0.000 frame.py:4509(_sanitize_column)
+            1    0.000    0.000    0.000    0.000 util.py:1123(compile_infix_regex)
+            2    0.000    0.000    0.000    0.000 tb_framework.py:6(TransitionModel)
+            4    0.000    0.000    0.000    0.000 common.py:459(is_interval_dtype)
+            1    0.000    0.000    0.000    0.000 util.py:1487(combine_score_weights)
+          150    0.000    0.000    0.000    0.000 chain.py:39(<genexpr>)
+           43    0.000    0.000    0.000    0.000 pathlib.py:1089(_init)
+            8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:87(acquire)
+            3    0.000    0.000    0.000    0.000 ragged2list.py:12(ragged2list)
+            1    0.000    0.000    0.000    0.000 util.py:318(get_lang_class)
+           24    0.000    0.000    0.000    0.000 types.py:171(__get__)
+        46/45    0.000    0.000    0.000    0.000 {built-in method numpy.asarray}
+            1    0.000    0.000    0.000    0.000 concat.py:74(concat_compat)
+            4    0.000    0.000    0.000    0.000 __init__.py:84(find_spec)
+            4    0.000    0.000    0.000    0.000 {built-in method torch._C._set_default_tensor_type}
+            1    0.000    0.000    0.000    0.000 language.py:334(pipe_names)
+           10    0.000    0.000    0.000    0.000 missing.py:149(_isna)
+            1    0.000    0.000    0.000    0.000 sre_compile.py:536(_compile_info)
+           39    0.000    0.000    0.000    0.000 pathlib.py:102(join_parsed_parts)
+            2    0.000    0.000    0.000    0.000 take.py:350(wrapper)
+           13    0.000    0.000    0.000    0.000 _collections.py:20(__missing__)
+            2    0.000    0.000    0.000    0.000 utils.py:197(validate_indices)
+            3    0.000    0.000    0.000    0.000 warnings.py:181(_add_filter)
+           28    0.000    0.000    0.000    0.000 <string>:2(__eq__)
+            1    0.000    0.000    0.000    0.000 contextlib.py:438(enter_context)
+           22    0.000    0.000    0.000    0.000 encoder.py:104(__init__)
+            7    0.000    0.000    0.000    0.000 _methods.py:54(_any)
+           28    0.000    0.000    0.000    0.000 model.py:233(has_grad)
+            1    0.000    0.000    0.000    0.000 __init__.py:843(__init__)
+            1    0.000    0.000    0.000    0.000 dep_parser.pyx:258(__init__)
+            2    0.000    0.000    0.000    0.000 parser.py:97(_define_lower)
+            8    0.000    0.000    0.000    0.000 construction.py:379(extract_array)
+            1    0.000    0.000    0.000    0.000 base.py:2154(is_monotonic)
+            2    0.000    0.000    0.000    0.000 list2array.py:12(list2array)
+            7    0.000    0.000    0.000    0.000 base.py:654(_simple_new)
+            2    0.000    0.000    0.000    0.000 managers.py:1665(is_consolidated)
+            6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:160(__exit__)
+           45    0.000    0.000    0.000    0.000 common.py:1552(get_dtype)
+           19    0.000    0.000    0.000    0.000 {built-in method numpy.empty}
+            1    0.000    0.000    0.000    0.000 base.py:2162(is_monotonic_increasing)
+            4    0.000    0.000    0.000    0.000 dtypes.py:1206(is_dtype)
+            1    0.000    0.000    0.000    0.000 ner.pyx:195(__init__)
+           24    0.000    0.000    0.000    0.000 typing.py:1083(<genexpr>)
+            3    0.000    0.000    0.000    0.000 configparser.py:831(items)
+            6    0.000    0.000    0.000    0.000 common.py:1274(is_bool_dtype)
+           21    0.000    0.000    0.000    0.000 model.py:195(maybe_get_dim)
+           21    0.000    0.000    0.000    0.000 base.py:55(<genexpr>)
+           57    0.000    0.000    0.000    0.000 {method 'values' of 'mappingproxy' objects}
+            2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:203(_lock_unlock_module)
+           10    0.000    0.000    0.000    0.000 base.py:5905(_index_as_unique)
+           13    0.000    0.000    0.000    0.000 _dtype.py:307(_name_includes_bit_suffix)
+            2    0.000    0.000    0.000    0.000 datetimelike.py:591(_validate_scalar)
+            2    0.000    0.000    0.000    0.000 managers.py:1673(_consolidate_check)
+            6    0.000    0.000    0.000    0.000 typing.py:137(_type_check)
+            2    0.000    0.000    0.000    0.000 _precomputable_affine.py:6(PrecomputableAffine)
+          136    0.000    0.000    0.000    0.000 {built-in method gc.enable}
+          136    0.000    0.000    0.000    0.000 {built-in method gc.disable}
+            8    0.000    0.000    0.000    0.000 __init__.py:57(find_spec)
+           36    0.000    0.000    0.000    0.000 base.py:884(__len__)
+            3    0.000    0.000    0.000    0.000 construction.py:695(_try_cast)
+            4    0.000    0.000    0.000    0.000 base.py:5917(_maybe_promote)
+            8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:112(release)
+            1    0.000    0.000    0.000    0.000 datetimes.py:2243(maybe_convert_dtype)
+            4    0.000    0.000    0.000    0.000 typing.py:957(__hash__)
+           36    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:64(_relax_case)
+            1    0.000    0.000    0.000    0.000 specifiers.py:491(_compare_less_than)
+            2    0.000    0.000    0.000    0.000 _ufunc_config.py:32(seterr)
+            3    0.000    0.000    0.000    0.000 common.py:423(is_period_dtype)
+           35    0.000    0.000    0.000    0.000 language.py:376(get_factory_name)
+            2    0.000    0.000    0.000    0.000 datetimelike.py:351(_get_getitem_freq)
+           32    0.000    0.000    0.000    0.000 typing.py:749(__eq__)
+           29    0.000    0.000    0.000    0.000 {function Table.__contains__ at 0x000001F0EA9D89D0}
+            2    0.000    0.000    0.000    0.000 <__array_function__ internals>:2(argsort)
+            4    0.000    0.000    0.000    0.000 base.py:7168(unpack_nested_dtype)
+            1    0.000    0.000    0.000    0.000 array_ops.py:134(_na_arithmetic_op)
+            4    0.000    0.000    0.000    0.000 _utils.py:227(_import_dotted_name)
+            1    0.000    0.000    0.000    0.000 __init__.py:850(normalize)
+            1    0.000    0.000    0.000    0.000 tagger.pyx:51(make_tagger)
+            2    0.000    0.000    0.000    0.000 {pandas._libs.algos.take_2d_axis1_object_object}
+           17    0.000    0.000    0.000    0.000 common.py:1148(needs_i8_conversion)
+            4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:736(find_spec)
+            3    0.000    0.000    0.000    0.000 base.py:845(_engine)
+            1    0.000    0.000    0.000    0.000 frame.py:821(shape)
+          9/1    0.000    0.000    0.000    0.000 ast.py:79(_convert)
+            1    0.000    0.000    0.000    0.000 _ufunc_config.py:429(__enter__)
+            4    0.000    0.000    0.000    0.000 __init__.py:151(_get_thread_state)
+           10    0.000    0.000    0.000    0.000 blocks.py:267(make_block_same_class)
+            1    0.000    0.000    0.000    0.000 base.py:5799(_raise_if_missing)
+            5    0.000    0.000    0.000    0.000 <__array_function__ internals>:2(copyto)
+           36    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:878(__exit__)
+           39    0.000    0.000    0.000    0.000 common.py:147(<lambda>)
+            1    0.000    0.000    0.000    0.000 numeric.py:270(_convert_slice_indexer)
+            1    0.000    0.000    0.000    0.000 config.py:255(__call__)
+           36    0.000    0.000    0.000    0.000 version.py:271(<genexpr>)
+           45    0.000    0.000    0.000    0.000 {built-in method nt.fspath}
+            2    0.000    0.000    0.000    0.000 base.py:3577(get_loc)
+            2    0.000    0.000    0.000    0.000 managers.py:1679(<listcomp>)
+            6    0.000    0.000    0.000    0.000 common.py:680(is_integer_dtype)
+            1    0.000    0.000    0.000    0.000 arc_eager.pyx:570(__init__)
+            1    0.000    0.000    0.000    0.000 base.py:3258(_wrap_setop_result)
+            1    0.000    0.000    0.000    0.000 senter.pyx:44(make_senter)
+           36    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:874(__enter__)
+            5    0.000    0.000    0.000    0.000 numerictypes.py:358(issubdtype)
+            1    0.000    0.000    0.000    0.000 tok2vec.py:26(make_tok2vec)
+            8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:185(cb)
+            1    0.000    0.000    0.000    0.000 config.py:127(_get_option)
+            1    0.000    0.000    0.000    0.000 managers.py:1196(_iset_single)
+            9    0.000    0.000    0.000    0.000 metadata.py:220(<genexpr>)
+           52    0.000    0.000    0.000    0.000 types.py:433(__get_validators__)
+            1    0.000    0.000    0.000    0.000 __init__.py:26(make_lemmatizer)
+            3    0.000    0.000    0.000    0.000 dtypes.py:955(is_dtype)
+            9    0.000    0.000    0.000    0.000 inference.py:184(is_array_like)
+            2    0.000    0.000    0.000    0.000 frame.py:587(__init__)
+           11    0.000    0.000    0.000    0.000 codecs.py:260(__init__)
+            2    0.000    0.000    0.000    0.000 language.py:284(disabled)
+            2    0.000    0.000    0.000    0.000 fromnumeric.py:1006(argsort)
+            1    0.000    0.000    0.000    0.000 managers.py:1731(from_array)
+            3    0.000    0.000    0.000    0.000 series.py:640(name)
+            1    0.000    0.000    0.000    0.000 util.py:1628(warn_if_jupyter_cupy)
+            8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1033(_handle_fromlist)
+            3    0.000    0.000    0.000    0.000 fromnumeric.py:51(_wrapfunc)
+            1    0.000    0.000    0.000    0.000 tagger.pyx:83(__init__)
+           11    0.000    0.000    0.000    0.000 common.py:1429(is_extension_array_dtype)
+            5    0.000    0.000    0.000    0.000 base.py:7082(maybe_extract_name)
+            1    0.000    0.000    0.000    0.000 generic.py:1705(_is_label_reference)
+           19    0.000    0.000    0.000    0.000 tokenize.py:170(add_whitespace)
+            4    0.000    0.000    0.000    0.000 {built-in method _imp.is_builtin}
+            2    0.000    0.000    0.000    0.000 contextlib.py:261(helper)
+            9    0.000    0.000    0.000    0.000 pathlib.py:784(__eq__)
+            3    0.000    0.000    0.000    0.000 {method 'remove' of 'list' objects}
+            2    0.000    0.000    0.000    0.000 datetimes.py:612(__array__)
+            5    0.000    0.000    0.000    0.000 blocks.py:1973(get_block_type)
+           56    0.000    0.000    0.000    0.000 model.py:112(shims)
+            1    0.000    0.000    0.000    0.000 enum.py:977(__and__)
+           15    0.000    0.000    0.000    0.000 config.py:967(_validate_overrides)
+            8    0.000    0.000    0.000    0.000 __init__.py:24(_module_matches_namespace)
+            1    0.000    0.000    0.000    0.000 version.py:351(public)
+            3    0.000    0.000    0.000    0.000 trainable_pipe.pyx:254(_validate_serialization_attrs)
+            2    0.000    0.000    0.000    0.000 sre_parse.py:355(_escape)
+          175    0.000    0.000    0.000    0.000 configparser.py:372(before_write)
+           11    0.000    0.000    0.000    0.000 model.py:133(dim_names)
+            1    0.000    0.000    0.000    0.000 lemmatizer.py:168(_validate_tables)
+            2    0.000    0.000    0.000    0.000 common.py:1399(is_1d_only_ea_obj)
+            2    0.000    0.000    0.000    0.000 {method 'min' of 'numpy.ndarray' objects}
+            7    0.000    0.000    0.000    0.000 generic.py:560(_get_axis)
+            1    0.000    0.000    0.000    0.000 attributeruler.py:26(make_attribute_ruler)
+            8    0.000    0.000    0.000    0.000 missing.py:390(array_equivalent)
+           12    0.000    0.000    0.000    0.000 take.py:326(_get_take_nd_function)
+            2    0.000    0.000    0.000    0.000 {pandas._libs.algos.take_2d_axis1_int64_int64}
+           23    0.000    0.000    0.000    0.000 {pandas._libs.lib.is_list_like}
+            1    0.000    0.000    0.000    0.000 contextlib.py:465(_push_cm_exit)
+            6    0.000    0.000    0.000    0.000 {built-in method builtins.eval}
+            1    0.000    0.000    0.000    0.000 tok2vec.py:49(__init__)
+            7    0.000    0.000    0.000    0.000 series.py:575(dtype)
+            1    0.000    0.000    0.000    0.000 lemmatizer.py:75(__init__)
+            5    0.000    0.000    0.000    0.000 {method 'clear' of 'dict' objects}
+            1    0.000    0.000    0.000    0.000 sre_compile.py:71(_compile)
+            2    0.000    0.000    0.000    0.000 managers.py:2102(<listcomp>)
+            1    0.000    0.000    0.000    0.000 expressions.py:223(evaluate)
+            1    0.000    0.000    0.000    0.000 blocks.py:2025(new_block)
+           27    0.000    0.000    0.000    0.000 version.py:393(_parse_letter_version)
+            1    0.000    0.000    0.000    0.000 senter.pyx:67(__init__)
+            2    0.000    0.000    0.000    0.000 _methods.py:42(_amin)
+            8    0.000    0.000    0.000    0.000 common.py:1483(is_ea_or_datetimelike_dtype)
+            1    0.000    0.000    0.000    0.000 version.py:293(__str__)
+            1    0.000    0.000    0.000    0.000 config.py:109(_get_single_key)
+           39    0.000    0.000    0.000    0.000 common.py:145(classes)
+           14    0.000    0.000    0.000    0.000 inference.py:321(is_hashable)
+            2    0.000    0.000    0.000    0.000 common.py:75(get_op_result_name)
+            2    0.000    0.000    0.000    0.000 contextlib.py:86(__init__)
+           12    0.000    0.000    0.000    0.000 concatenate.py:31(<genexpr>)
+            2    0.000    0.000    0.000    0.000 ntpath.py:124(splitdrive)
+            9    0.000    0.000    0.000    0.000 <string>:1(<lambda>)
+            1    0.000    0.000    0.000    0.000 cast.py:1960(construct_1d_object_array_from_listlike)
+           52    0.000    0.000    0.000    0.000 {built-in method _imp.acquire_lock}
+            3    0.000    0.000    0.000    0.000 managers.py:973(from_blocks)
+           28    0.000    0.000    0.000    0.000 _param_server.py:42(has_grad)
+            5    0.000    0.000    0.000    0.000 {built-in method builtins.round}
+            3    0.000    0.000    0.000    0.000 format.py:893(_read_bytes)
+            2    0.000    0.000    0.000    0.000 datetimes.py:496(_unbox_scalar)
+            7    0.000    0.000    0.000    0.000 base.py:4846(_get_engine_target)
+            1    0.000    0.000    0.000    0.000 format.py:218(read_magic)
+            3    0.000    0.000    0.000    0.000 common.py:1721(validate_all_hashable)
+            1    0.000    0.000    0.000    0.000 missing.py:226(_isna_array)
+           28    0.000    0.000    0.000    0.000 model.py:199(has_param)
+           10    0.000    0.000    0.000    0.000 numerictypes.py:284(issubclass_)
+            1    0.000    0.000    0.000    0.000 cast.py:691(infer_dtype_from_scalar)
+           24    0.000    0.000    0.000    0.000 {method 'keys' of 'mappingproxy' objects}
+            1    0.000    0.000    0.000    0.000 expressions.py:63(_evaluate_standard)
+            1    0.000    0.000    0.000    0.000 base.py:4009(_convert_slice_indexer)
+            5    0.000    0.000    0.000    0.000 blocks.py:2103(extend_blocks)
+            1    0.000    0.000    0.000    0.000 {method 'getvalue' of '_io.StringIO' objects}
+           56    0.000    0.000    0.000    0.000 base.py:4820(_values)
+            1    0.000    0.000    0.000    0.000 attributeruler.py:70(__init__)
+            3    0.000    0.000    0.000    0.000 {method 'argsort' of 'numpy.ndarray' objects}
+            4    0.000    0.000    0.000    0.000 {method 'take' of 'numpy.ndarray' objects}
+            2    0.000    0.000    0.000    0.000 warnings.py:458(__enter__)
+           26    0.000    0.000    0.000    0.000 {function Table.__getitem__ at 0x000001F0EA9D88B0}
+            7    0.000    0.000    0.000    0.000 __init__.py:765(__init__)
+           56    0.000    0.000    0.000    0.000 model.py:477(<listcomp>)
+           24    0.000    0.000    0.000    0.000 enum.py:792(value)
+           41    0.000    0.000    0.000    0.000 {method 'reverse' of 'list' objects}
+            6    0.000    0.000    0.000    0.000 sre_parse.py:254(get)
+            3    0.000    0.000    0.000    0.000 common.py:786(is_unsigned_integer_dtype)
+           10    0.000    0.000    0.000    0.000 base.py:803(is_)
+           17    0.000    0.000    0.000    0.000 blocks.py:354(dtype)
+           16    0.000    0.000    0.000    0.000 utils.py:60(<genexpr>)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:174(getwidth)
+            1    0.000    0.000    0.000    0.000 util.py:1019(is_in_jupyter)
+          106    0.000    0.000    0.000    0.000 arc_eager.pyx:711(init_transition)
+           14    0.000    0.000    0.000    0.000 __init__.py:865(__bool__)
+            1    0.000    0.000    0.000    0.000 <__array_function__ internals>:2(nonzero)
+            1    0.000    0.000    0.000    0.000 generic.py:1760(_check_label_or_level_ambiguity)
+           52    0.000    0.000    0.000    0.000 {built-in method _imp.release_lock}
+            9    0.000    0.000    0.000    0.000 {built-in method pandas._libs.missing.checknull}
+            7    0.000    0.000    0.000    0.000 sre_parse.py:233(__next)
+            2    0.000    0.000    0.000    0.000 pathlib.py:986(parent)
+           10    0.000    0.000    0.000    0.000 language.py:320(<listcomp>)
+            4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:811(find_spec)
+            1    0.000    0.000    0.000    0.000 util.py:1502(<dictcomp>)
+            1    0.000    0.000    0.000    0.000 sre_compile.py:461(_get_literal_prefix)
+            2    0.000    0.000    0.000    0.000 base.py:6284(_maybe_cast_indexer)
+            2    0.000    0.000    0.000    0.000 _ufunc_config.py:131(geterr)
+            2    0.000    0.000    0.000    0.000 generic.py:1732(<genexpr>)
+            4    0.000    0.000    0.000    0.000 config.py:363(_validate_sections)
+           36    0.000    0.000    0.000    0.000 {pandas._libs.lib.is_scalar}
+            1    0.000    0.000    0.000    0.000 _ufunc_config.py:434(__exit__)
+           35    0.000    0.000    0.000    0.000 language.py:821(<genexpr>)
+            2    0.000    0.000    0.000    0.000 _dtype.py:178(_datetime_metadata_str)
+            3    0.000    0.000    0.000    0.000 common.py:732(is_signed_integer_dtype)
+            2    0.000    0.000    0.000    0.000 cast.py:1711(sanitize_to_nanoseconds)
+            1    0.000    0.000    0.000    0.000 indexing.py:2016(_ensure_iterable_column_indexer)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:224(__init__)
+           12    0.000    0.000    0.000    0.000 common.py:155(<lambda>)
+            1    0.000    0.000    0.000    0.000 util.py:1416(dict_to_dot)
+            4    0.000    0.000    0.000    0.000 {built-in method nt.getcwd}
+           30    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
+            4    0.000    0.000    0.000    0.000 {method 'set' of 'ContextVar' objects}
+            1    0.000    0.000    0.000    0.000 metadata.py:392(__init__)
+            2    0.000    0.000    0.000    0.000 specifiers.py:627(<listcomp>)
+            1    0.000    0.000    0.000    0.000 format.py:283(descr_to_dtype)
+            2    0.000    0.000    0.000    0.000 datetimelike.py:313(__array__)
+            1    0.000    0.000    0.000    0.000 language.py:280(config)
+            1    0.000    0.000    0.000    0.000 {built-in method _operator.ge}
+            2    0.000    0.000    0.000    0.000 vocab.pyx:97(__get__)
+            3    0.000    0.000    0.000    0.000 {method 'nonzero' of 'numpy.ndarray' objects}
+            3    0.000    0.000    0.000    0.000 base.py:4973(__contains__)
+            7    0.000    0.000    0.000    0.000 managers.py:1837(dtype)
+            2    0.000    0.000    0.000    0.000 {pandas._libs.algos.take_2d_axis0_float64_float64}
+            3    0.000    0.000    0.000    0.000 construction.py:627(_sanitize_ndim)
+           15    0.000    0.000    0.000    0.000 generic.py:546(_get_axis_number)
+            2    0.000    0.000    0.000    0.000 {pandas._libs.algos.take_1d_int64_int64}
+            4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:351(__init__)
+            4    0.000    0.000    0.000    0.000 threading.py:1351(current_thread)
+            4    0.000    0.000    0.000    0.000 frame.py:1413(__len__)
+           11    0.000    0.000    0.000    0.000 contextlib.py:382(__exit__)
+           23    0.000    0.000    0.000    0.000 datetimes.py:545(dtype)
+            4    0.000    0.000    0.000    0.000 base.py:2624(_is_multi)
+            3    0.000    0.000    0.000    0.000 utils.py:69(is_list_like_indexer)
+            9    0.000    0.000    0.000    0.000 version.py:432(_parse_local_version)
+            2    0.000    0.000    0.000    0.000 {pandas._libs.algos.take_2d_axis0_int64_int64}
+            2    0.000    0.000    0.000    0.000 ner.pyx:242(__get__)
+            2    0.000    0.000    0.000    0.000 frame.py:3920(_clear_item_cache)
+           27    0.000    0.000    0.000    0.000 concatenate.py:35(<genexpr>)
+            2    0.000    0.000    0.000    0.000 lookups.py:177(__contains__)
+           28    0.000    0.000    0.000    0.000 language.py:825(<genexpr>)
+            2    0.000    0.000    0.000    0.000 {pandas._libs.algos.take_2d_axis0_int32_int32}
+            3    0.000    0.000    0.000    0.000 indexing.py:709(<genexpr>)
+           11    0.000    0.000    0.000    0.000 contextlib.py:376(__init__)
+            3    0.000    0.000    0.000    0.000 configparser.py:992(__iter__)
+            1    0.000    0.000    0.000    0.000 common.py:348(is_datetime64tz_dtype)
+            2    0.000    0.000    0.000    0.000 base.py:4226(_wrap_reindex_result)
+            1    0.000    0.000    0.000    0.000 {built-in method numpy.arange}
+            4    0.000    0.000    0.000    0.000 {method '_from_backing_data' of 'pandas._libs.arrays.NDArrayBacked' objects}
+            1    0.000    0.000    0.000    0.000 datetimes.py:326(_simple_new)
+            3    0.000    0.000    0.000    0.000 base.py:2642(_na_value)
+            4    0.000    0.000    0.000    0.000 {built-in method builtins.locals}
+            1    0.000    0.000    0.000    0.000 contextlib.py:470(_push_exit_callback)
+           13    0.000    0.000    0.000    0.000 _collections.py:24(<lambda>)
+            4    0.000    0.000    0.000    0.000 missing.py:911(clean_reindex_fill_method)
+            2    0.000    0.000    0.000    0.000 specifiers.py:138(_get_operator)
+            6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:152(__init__)
+           13    0.000    0.000    0.000    0.000 _dtype.py:24(_kind_name)
+            6    0.000    0.000    0.000    0.000 cast.py:454(ensure_dtype_can_hold_na)
+            4    0.000    0.000    0.000    0.000 {method 'view' of 'numpy.ndarray' objects}
+            7    0.000    0.000    0.000    0.000 {pandas._libs.lib.maybe_indices_to_slice}
+            4    0.000    0.000    0.000    0.000 typing.py:951(__eq__)
+           21    0.000    0.000    0.000    0.000 __init__.py:649(update)
+            7    0.000    0.000    0.000    0.000 base.py:834(_reset_identity)
+            1    0.000    0.000    0.000    0.000 version.py:87(__ge__)
+            2    0.000    0.000    0.000    0.000 tok2vec.py:80(add_listener)
+            2    0.000    0.000    0.000    0.000 dep_parser.pyx:312(__get__)
+            4    0.000    0.000    0.000    0.000 _collections.py:23(freeze)
+            1    0.000    0.000    0.000    0.000 datetimelike.py:1911(maybe_infer_freq)
+            1    0.000    0.000    0.000    0.000 series.py:743(__len__)
+            1    0.000    0.000    0.000    0.000 util.py:192(__init__)
+            1    0.000    0.000    0.000    0.000 util.py:540(get_sourced_components)
+            6    0.000    0.000    0.000    0.000 typing.py:128(_type_convert)
+            1    0.000    0.000    0.000    0.000 contextlib.py:408(__init__)
+            6    0.000    0.000    0.000    0.000 sre_parse.py:172(append)
+            1    0.000    0.000    0.000    0.000 zipp.py:139(_pathlib_compat)
+            1    0.000    0.000    0.000    0.000 base.py:768(_shallow_copy)
+            1    0.000    0.000    0.000    0.000 blocks.py:612(should_store)
+            1    0.000    0.000    0.000    0.000 util.py:1423(<dictcomp>)
+            1    0.000    0.000    0.000    0.000 common.py:191(is_sparse)
+           14    0.000    0.000    0.000    0.000 base.py:1650(name)
+            2    0.000    0.000    0.000    0.000 __init__.py:93(<dictcomp>)
+           19    0.000    0.000    0.000    0.000 {method 'span' of 're.Match' objects}
+           20    0.000    0.000    0.000    0.000 {built-in method _thread.get_ident}
+            2    0.000    0.000    0.000    0.000 warnings.py:437(__init__)
+           12    0.000    0.000    0.000    0.000 typing.py:946(<genexpr>)
+            3    0.000    0.000    0.000    0.000 concat.py:112(<genexpr>)
+            2    0.000    0.000    0.000    0.000 generic.py:566(_get_block_manager_axis)
+            4    0.000    0.000    0.000    0.000 series.py:590(name)
+            1    0.000    0.000    0.000    0.000 util.py:1130(<listcomp>)
+            2    0.000    0.000    0.000    0.000 {method 'cache_clear' of 'functools._lru_cache_wrapper' objects}
+            2    0.000    0.000    0.000    0.000 warnings.py:477(__exit__)
+            4    0.000    0.000    0.000    0.000 six.py:194(find_spec)
+            1    0.000    0.000    0.000    0.000 fromnumeric.py:1829(nonzero)
+            1    0.000    0.000    0.000    0.000 <__array_function__ internals>:2(ndim)
+            1    0.000    0.000    0.000    0.000 config.py:634(_warn_if_deprecated)
+            6    0.000    0.000    0.000    0.000 common.py:1740(<genexpr>)
+            4    0.000    0.000    0.000    0.000 version.py:368(is_prerelease)
+            2    0.000    0.000    0.000    0.000 {method 'get_loc' of 'pandas._libs.index.IndexEngine' objects}
+            1    0.000    0.000    0.000    0.000 common.py:97(_maybe_match_name)
+            3    0.000    0.000    0.000    0.000 generic.py:5569(__getattr__)
+            2    0.000    0.000    0.000    0.000 ntpath.py:34(_get_bothseps)
+            4    0.000    0.000    0.000    0.000 typing.py:945(_value_and_type_iter)
+            1    0.000    0.000    0.000    0.000 pathlib.py:46(_ignore_error)
+            1    0.000    0.000    0.000    0.000 common.py:540(is_string_dtype)
+            1    0.000    0.000    0.000    0.000 _validators.py:427(validate_ascending)
+            2    0.000    0.000    0.000    0.000 common.py:552(require_length_match)
+            1    0.000    0.000    0.000    0.000 utils.py:321(length_of_indexer)
+            1    0.000    0.000    0.000    0.000 blocks.py:2119(ensure_block_shape)
+            3    0.000    0.000    0.000    0.000 config.py:349(_set_overrides)
+            2    0.000    0.000    0.000    0.000 model.py:264(get_ref)
+            1    0.000    0.000    0.000    0.000 vocab.pyx:90(__set__)
+            2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:948(_sanity_check)
+            1    0.000    0.000    0.000    0.000 inference.py:359(is_sequence)
+            4    0.000    0.000    0.000    0.000 {built-in method builtins.__import__}
+           21    0.000    0.000    0.000    0.000 {pandas._libs.algos.ensure_platform_int}
+            6    0.000    0.000    0.000    0.000 sre_parse.py:164(__getitem__)
+            2    0.000    0.000    0.000    0.000 common.py:1747(pandas_dtype)
+            2    0.000    0.000    0.000    0.000 base.py:4230(_maybe_preserve_names)
+            1    0.000    0.000    0.000    0.000 util.py:1464(walk_dict)
+           20    0.000    0.000    0.000    0.000 {method 'end' of 're.Match' objects}
+            1    0.000    0.000    0.000    0.000 py3k.py:53(isfileobj)
+            2    0.000    0.000    0.000    0.000 config.py:595(_get_deprecated_option)
+            2    0.000    0.000    0.000    0.000 base.py:2308(is_integer)
+            2    0.000    0.000    0.000    0.000 indexing.py:696(<genexpr>)
+           18    0.000    0.000    0.000    0.000 version.py:459(<lambda>)
+            3    0.000    0.000    0.000    0.000 vocab.pyx:444(__get__)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:286(tell)
+            1    0.000    0.000    0.000    0.000 config.py:581(_get_root)
+            1    0.000    0.000    0.000    0.000 managers.py:2137(_preprocess_slice_or_indexer)
+            2    0.000    0.000    0.000    0.000 util.py:1134(add_lookups)
+            7    0.000    0.000    0.000    0.000 language.py:410(get_pipe_meta)
+            1    0.000    0.000    0.000    0.000 vocab.pyx:447(__set__)
+           12    0.000    0.000    0.000    0.000 common.py:150(classes_and_not_datetimelike)
+            3    0.000    0.000    0.000    0.000 indexing.py:708(<genexpr>)
+            1    0.000    0.000    0.000    0.000 metadata.py:217(_discover_resolvers)
+            1    0.000    0.000    0.000    0.000 {built-in method sys.exc_info}
+            1    0.000    0.000    0.000    0.000 {method 'fill' of 'numpy.ndarray' objects}
+            2    0.000    0.000    0.000    0.000 {built-in method numpy.seterrobj}
+            1    0.000    0.000    0.000    0.000 sre_compile.py:453(_get_iscased)
+            1    0.000    0.000    0.000    0.000 missing.py:138(dispatch_fill_zeros)
+            1    0.000    0.000    0.000    0.000 dispatch.py:11(should_extension_dispatch)
+            1    0.000    0.000    0.000    0.000 blocks.py:2039(check_ndim)
+            1    0.000    0.000    0.000    0.000 base.py:45(__len__)
+            1    0.000    0.000    0.000    0.000 series.py:825(__array__)
+            2    0.000    0.000    0.000    0.000 lookups.py:170(__init__)
+            2    0.000    0.000    0.000    0.000 {method 'startswith' of 'bytes' objects}
+            4    0.000    0.000    0.000    0.000 {built-in method _imp.is_frozen}
+            1    0.000    0.000    0.000    0.000 concat.py:106(<listcomp>)
+            7    0.000    0.000    0.000    0.000 base.py:937(dtype)
+            3    0.000    0.000    0.000    0.000 util.py:733(<genexpr>)
+            3    0.000    0.000    0.000    0.000 lemmatizer.py:117(mode)
+            7    0.000    0.000    0.000    0.000 2466562680.py:134(log)
+            1    0.000    0.000    0.000    0.000 common.py:1042(is_numeric_v_string_like)
+            3    0.000    0.000    0.000    0.000 construction.py:664(_sanitize_str_dtypes)
+            2    0.000    0.000    0.000    0.000 base.py:7046(ensure_has_len)
+            4    0.000    0.000    0.000    0.000 frame.py:804(axes)
+            1    0.000    0.000    0.000    0.000 series.py:542(_set_axis)
+            2    0.000    0.000    0.000    0.000 language.py:292(<listcomp>)
+            4    0.000    0.000    0.000    0.000 six.py:190(find_spec)
+            1    0.000    0.000    0.000    0.000 zipfile.py:1805(__del__)
+            2    0.000    0.000    0.000    0.000 datetimes.py:570(tz)
+            4    0.000    0.000    0.000    0.000 version.py:301(<genexpr>)
+            1    0.000    0.000    0.000    0.000 metadata.py:395(path)
+            3    0.000    0.000    0.000    0.000 util.py:735(<genexpr>)
+            1    0.000    0.000    0.000    0.000 contextlib.py:398(_create_exit_wrapper)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:111(__init__)
+            1    0.000    0.000    0.000    0.000 tokenize.py:164(__init__)
+            1    0.000    0.000    0.000    0.000 frame.py:3883(_ensure_valid_index)
+           11    0.000    0.000    0.000    0.000 version.py:340(dev)
+            3    0.000    0.000    0.000    0.000 lookups.py:248(has_table)
+            7    0.000    0.000    0.000    0.000 language.py:420(get_pipe_config)
+            8    0.000    0.000    0.000    0.000 {method 'partition' of 'str' objects}
+            5    0.000    0.000    0.000    0.000 pipe.pxd:2(__set__)
+            1    0.000    0.000    0.000    0.000 _decorators.py:214(_format_argument_list)
+            1    0.000    0.000    0.000    0.000 base.py:1701(_get_names)
+            1    0.000    0.000    0.000    0.000 generic.py:554(_get_axis_name)
+            1    0.000    0.000    0.000    0.000 generic.py:3937(_set_is_copy)
+            2    0.000    0.000    0.000    0.000 managers.py:217(is_single_block)
+            1    0.000    0.000    0.000    0.000 {pandas._libs.internals.get_blkno_placements}
+            2    0.000    0.000    0.000    0.000 sre_compile.py:595(isstring)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:76(__init__)
+            3    0.000    0.000    0.000    0.000 configparser.py:989(__len__)
+            2    0.000    0.000    0.000    0.000 base.py:518(<genexpr>)
+            2    0.000    0.000    0.000    0.000 base.py:2344(is_floating)
+            1    0.000    0.000    0.000    0.000 indexing.py:267(loc)
+           11    0.000    0.000    0.000    0.000 contextlib.py:379(__enter__)
+            1    0.000    0.000    0.000    0.000 sre_compile.py:432(_generate_overlap_table)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:921(fix_flags)
+            1    0.000    0.000    0.000    0.000 common.py:1528(_is_dtype)
+            2    0.000    0.000    0.000    0.000 common.py:297(is_null_slice)
+            1    0.000    0.000    0.000    0.000 indexing.py:2311(convert_to_index_sliceable)
+            1    0.000    0.000    0.000    0.000 {method '__enter__' of '_io._IOBase' objects}
+            1    0.000    0.000    0.000    0.000 {method 'decode' of 'bytes' objects}
+            2    0.000    0.000    0.000    0.000 {built-in method builtins.vars}
+            4    0.000    0.000    0.000    0.000 {built-in method numpy.geterrobj}
+            2    0.000    0.000    0.000    0.000 sre_parse.py:81(groups)
+            2    0.000    0.000    0.000    0.000 _validators.py:218(validate_bool_kwarg)
+            4    0.000    0.000    0.000    0.000 missing.py:107(clean_fill_method)
+            9    0.000    0.000    0.000    0.000 version.py:331(pre)
+            2    0.000    0.000    0.000    0.000 {built-in method _stat.S_ISREG}
+           12    0.000    0.000    0.000    0.000 pipe.pyx:106(__get__)
+            2    0.000    0.000    0.000    0.000 ner.pyx:245(genexpr)
+            4    0.000    0.000    0.000    0.000 configparser.py:641(defaults)
+            1    0.000    0.000    0.000    0.000 __init__.py:857(legacy_normalize)
+            3    0.000    0.000    0.000    0.000 common.py:1416(is_1d_only_ea_dtype)
+            3    0.000    0.000    0.000    0.000 construction.py:684(_maybe_repeat)
+            5    0.000    0.000    0.000    0.000 blocks.py:244(mgr_locs)
+            4    0.000    0.000    0.000    0.000 managers.py:919(__init__)
+            1    0.000    0.000    0.000    0.000 util.py:1506(<listcomp>)
+            2    0.000    0.000    0.000    0.000 specifiers.py:144(_coerce_version)
+            7    0.000    0.000    0.000    0.000 specifiers.py:149(operator)
+            1    0.000    0.000    0.000    0.000 specifiers.py:694(__iter__)
+            1    0.000    0.000    0.000    0.000 language.py:79(create_tokenizer)
+            1    0.000    0.000    0.000    0.000 {built-in method _functools.reduce}
+            1    0.000    0.000    0.000    0.000 {built-in method _sre.compile}
+            1    0.000    0.000    0.000    0.000 {built-in method _struct.calcsize}
+            2    0.000    0.000    0.000    0.000 {method 'readline' of '_io.StringIO' objects}
+            1    0.000    0.000    0.000    0.000 {method 'seek' of '_io.BufferedReader' objects}
+            7    0.000    0.000    0.000    0.000 {built-in method _warnings._filters_mutated}
+            1    0.000    0.000    0.000    0.000 {built-in method _simple_new}
+            6    0.000    0.000    0.000    0.000 pipe.pyx:102(__get__)
+            1    0.000    0.000    0.000    0.000 _ufunc_config.py:425(__init__)
+            1    0.000    0.000    0.000    0.000 common.py:533(is_string_or_object_np_dtype)
+            5    0.000    0.000    0.000    0.000 version.py:321(epoch)
+            1    0.000    0.000    0.000    0.000 lemmatizer.py:60(get_lookups_config)
+            8    0.000    0.000    0.000    0.000 {built-in method _sre.unicode_iscased}
+            2    0.000    0.000    0.000    0.000 {built-in method numpy.datetime_data}
+            3    0.000    0.000    0.000    0.000 trainable_pipe.pxd:5(__set__)
+            7    0.000    0.000    0.000    0.000 pipe.pxd:2(__get__)
+            5    0.000    0.000    0.000    0.000 multiarray.py:1071(copyto)
+            3    0.000    0.000    0.000    0.000 format.py:613(<genexpr>)
+            2    0.000    0.000    0.000    0.000 concat.py:95(is_nonempty)
+            3    0.000    0.000    0.000    0.000 concat.py:118(<genexpr>)
+            1    0.000    0.000    0.000    0.000 construction.py:802(is_empty_data)
+            3    0.000    0.000    0.000    0.000 base.py:692(_constructor)
+            3    0.000    0.000    0.000    0.000 base.py:1124(_maybe_disallow_fill)
+            6    0.000    0.000    0.000    0.000 version.py:326(release)
+            1    0.000    0.000    0.000    0.000 _structures.py:19(__eq__)
+            1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+            1    0.000    0.000    0.000    0.000 tokenize.py:612(generate_tokens)
+            1    0.000    0.000    0.000    0.000 __init__.py:902(__init__)
+            4    0.000    0.000    0.000    0.000 _compat.py:51(find_spec)
+            1    0.000    0.000    0.000    0.000 config.py:563(_select_options)
+            2    0.000    0.000    0.000    0.000 {method 'lstrip' of 'str' objects}
+            1    0.000    0.000    0.000    0.000 sre_parse.py:160(__len__)
+            1    0.000    0.000    0.000    0.000 config.py:622(_translate_key)
+            1    0.000    0.000    0.000    0.000 concat.py:111(<setcomp>)
+            1    0.000    0.000    0.000    0.000 indexing.py:804(_validate_key_length)
+            1    0.000    0.000    0.000    0.000 numeric.py:125(inferred_type)
+            1    0.000    0.000    0.000    0.000 util.py:547(<dictcomp>)
+            2    0.000    0.000    0.000    0.000 util.py:736(<genexpr>)
+            1    0.000    0.000    0.000    0.000 lemmatizer.py:47(make_lemmatizer_scorer)
+            1    0.000    0.000    0.000    0.000 {built-in method _struct.unpack}
+            1    0.000    0.000    0.000    0.000 {built-in method pandas._libs.tslibs.offsets.to_offset}
+            1    0.000    0.000    0.000    0.000 {built-in method pandas._libs.tslibs.timezones.maybe_get_tz}
+            4    0.000    0.000    0.000    0.000 __init__.py:89(<lambda>)
+            1    0.000    0.000    0.000    0.000 zipfile.py:662(_check_compression)
+            1    0.000    0.000    0.000    0.000 zipfile.py:1809(close)
+            1    0.000    0.000    0.000    0.000 common.py:315(is_datetime64_dtype)
+            1    0.000    0.000    0.000    0.000 common.py:389(is_timedelta64_dtype)
+            6    0.000    0.000    0.000    0.000 base.py:326(ndim)
+            3    0.000    0.000    0.000    0.000 base.py:540(_ensure_array)
+            1    0.000    0.000    0.000    0.000 base.py:3554(_assert_can_do_setop)
+            1    0.000    0.000    0.000    0.000 base.py:4092(_validate_can_reindex)
+            1    0.000    0.000    0.000    0.000 generic.py:3960(_check_setitem_copy)
+            1    0.000    0.000    0.000    0.000 indexing.py:2430(is_nested_tuple)
+            2    0.000    0.000    0.000    0.000 managers.py:2111(<listcomp>)
+            1    0.000    0.000    0.000    0.000 version.py:69(__lt__)
+            5    0.000    0.000    0.000    0.000 version.py:336(post)
+            5    0.000    0.000    0.000    0.000 version.py:344(local)
+            1    0.000    0.000    0.000    0.000 language.py:340(<listcomp>)
+            5    0.000    0.000    0.000    0.000 {pandas._libs.lib.item_from_zerodim}
+            2    0.000    0.000    0.000    0.000 datetimes.py:505(_check_compatible_with)
+            4    0.000    0.000    0.000    0.000 base.py:6022(_is_comparable_dtype)
+            2    0.000    0.000    0.000    0.000 specifiers.py:715(prereleases)
+            2    0.000    0.000    0.000    0.000 language.py:1839(<genexpr>)
+            1    0.000    0.000    0.000    0.000 tokenizer.pyx:814(lambda17)
+            1    0.000    0.000    0.000    0.000 {method 'pop' of 'collections.deque' objects}
+            3    0.000    0.000    0.000    0.000 {built-in method _json.encode_basestring_ascii}
+            2    0.000    0.000    0.000    0.000 {pandas._libs.lib.is_bool_list}
+            1    0.000    0.000    0.000    0.000 tokenizer.pyx:809(lambda12)
+            2    0.000    0.000    0.000    0.000 fromnumeric.py:1002(_argsort_dispatcher)
+            1    0.000    0.000    0.000    0.000 format.py:191(_check_version)
+            3    0.000    0.000    0.000    0.000 base.py:229(disallow_kwargs)
+            2    0.000    0.000    0.000    0.000 frame.py:578(_constructor)
+            1    0.000    0.000    0.000    0.000 generic.py:1840(<listcomp>)
+            1    0.000    0.000    0.000    0.000 specifiers.py:697(prereleases)
+            1    0.000    0.000    0.000    0.000 ner.pyx:184(make_ner_scorer)
+            1    0.000    0.000    0.000    0.000 senter.pyx:58(make_senter_scorer)
+            1    0.000    0.000    0.000    0.000 {method 'append' of 'collections.deque' objects}
+            1    0.000    0.000    0.000    0.000 {method 'astype' of 'numpy.ndarray' objects}
+            1    0.000    0.000    0.000    0.000 function.py:49(__call__)
+            1    0.000    0.000    0.000    0.000 datetimes.py:96(tz_to_dtype)
+            2    0.000    0.000    0.000    0.000 datetimes.py:2376(validate_tz_from_dtype)
+            1    0.000    0.000    0.000    0.000 datetimelike.py:880(freq)
+            1    0.000    0.000    0.000    0.000 base.py:3050(_validate_sort_keyword)
+            3    0.000    0.000    0.000    0.000 base.py:4027(is_int)
+            1    0.000    0.000    0.000    0.000 attributeruler.py:58(make_attribute_ruler_scorer)
+            1    0.000    0.000    0.000    0.000 util.py:728(<listcomp>)
+            2    0.000    0.000    0.000    0.000 specifiers.py:153(version)
+            2    0.000    0.000    0.000    0.000 senter.pyx:103(hide_labels)
+            3    0.000    0.000    0.000    0.000 {pandas._libs.lib.is_bool}
+            1    0.000    0.000    0.000    0.000 <string>:1(<module>)
+            3    0.000    0.000    0.000    0.000 trainable_pipe.pxd:6(__set__)
+            3    0.000    0.000    0.000    0.000 trainable_pipe.pxd:7(__set__)
+            1    0.000    0.000    0.000    0.000 sre_parse.py:249(match)
+            1    0.000    0.000    0.000    0.000 tokenizer.pyx:810(lambda13)
+            1    0.000    0.000    0.000    0.000 interactiveshell.py:589(get_ipython)
+            1    0.000    0.000    0.000    0.000 fromnumeric.py:3123(_ndim_dispatcher)
+            1    0.000    0.000    0.000    0.000 fromnumeric.py:3127(ndim)
+            1    0.000    0.000    0.000    0.000 common.py:569(condition)
+            1    0.000    0.000    0.000    0.000 concat.py:117(<setcomp>)
+            1    0.000    0.000    0.000    0.000 datetimes.py:2334(_validate_dt64_dtype)
+            1    0.000    0.000    0.000    0.000 datetimelike.py:1876(validate_inferred_freq)
+            1    0.000    0.000    0.000    0.000 base.py:7191(_maybe_try_sort)
+            2    0.000    0.000    0.000    0.000 generic.py:1727(<genexpr>)
+            1    0.000    0.000    0.000    0.000 series.py:523(_constructor)
+            1    0.000    0.000    0.000    0.000 dep_parser.pyx:247(make_parser_scorer)
+            1    0.000    0.000    0.000    0.000 tokenizer.pyx:813(lambda16)
+            2    0.000    0.000    0.000    0.000 trainable_pipe.pxd:8(__set__)
+            1    0.000    0.000    0.000    0.000 contextlib.py:486(__enter__)
+            1    0.000    0.000    0.000    0.000 tokenizer.pyx:811(lambda14)
+            1    0.000    0.000    0.000    0.000 fromnumeric.py:1825(_nonzero_dispatcher)
+            1    0.000    0.000    0.000    0.000 base.py:1898(nlevels)
+            1    0.000    0.000    0.000    0.000 indexing.py:1020(_has_valid_setitem_indexer)
+            1    0.000    0.000    0.000    0.000 numeric.py:331(_is_all_dates)
+            1    0.000    0.000    0.000    0.000 managers.py:222(items)
+            1    0.000    0.000    0.000    0.000 tagger.pyx:74(make_tagger_scorer)
+            1    0.000    0.000    0.000    0.000 tokenizer.pyx:812(lambda15)
+            1    0.000    0.000    0.000    0.000 {built-in method _sre.unicode_tolower}
+            1    0.000    0.000    0.000    0.000 {built-in method from_iterable}
+            1    0.000    0.000    0.000    0.000 generic.py:1780(<genexpr>)
+            1    0.000    0.000    0.000    0.000 _structures.py:25(__ge__)
+            1    0.000    0.000    0.000    0.000 language.py:1853(<listcomp>)
+            1    0.000    0.000    0.000    0.000 tokenizer.pyx:815(lambda18)
+    
+    
+    
+
+----
+
+### With gprof2dot
+
+1. [install graphviz](https://graphviz.org/download/)
+2. pip install graphviz
+3. clone github repo [gprof2dot](https://github.com/jrfonseca/gprof2dot)
+    -> you have to know the path to the clone/install location for later
+4. create a file with code to profile
+5. run profiler with cmd -> go to your project directory before:
+    ```terminal
+    python -m cProfile -o to_profile.pstats to_profile.py
+    ```
+    -> Example:<br>
+    ```terminal
+    D:\Studium\4. Semester\Module\NLP\Praktikum\2022_05_16 Job Posts Similarity\Word2Vec-Ansatz>python -m cProfile -o to_profile.pstats to_profile.py
+    ```
+6. run gprof2dot: 
+    ```terminal
+    gprof2dot -f pstats to_profile.pstats | dot -Tpng -o output.png && eog output.png
+    ```
+    -> Example:<br>
+    ```terminal
+    D:\Informatik\Tools\gprof2dot\gprof2dot.py -f pstats to_profile.pstats | dot -Tsvg -o callgraph.svg
+
+    D:\Informatik\Tools\gprof2dot\gprof2dot.py -f pstats to_profile.pstats | dot -Tpng -o output.png
+    ```
+
+---
+
+This doesn't worked for me so I used [SnakeViz](https://jiffyclub.github.io/snakeviz/#snakeviz):
+
+### [With SnakeViz](https://jiffyclub.github.io/snakeviz/#snakeviz)
+
+1. create a file with code to profile
+2. run profiler with cmd -> go to your project directory before:
+    ```terminal
+    python -m cProfile -o program.prof to_profile.py
+    ```
+    -> Example:<br>
+    ```terminal
+    D:\Studium\4. Semester\Module\NLP\Praktikum\2022_05_16 Job Posts Similarity\Word2Vec-Ansatz>python -m cProfile -o to_profile.prof to_profile.py
+    ```
+3. pip install snakeviz
+4. run snakeviz with command: snakeviz program.prof<br>
+    for notebooks:<br>
+        - %load_ext snakeviz<br>
+        - % snakeviz glob.glob('*.txt')<br>
+
+
+```python
+%load_ext snakeviz
+```
+
+
+```python
+%snakeviz get_similar_job_posts(sample, post, title_w=2.0, category_w=1.0, type_w=0.0, pos_w=0.0, printing=False, show_progress=False)
+```
+
+     
+    *** Profile stats marshalled to file 'C:\\Users\\tobia\\AppData\\Local\\Temp\\tmplfvoqgdt'.
+    Embedding SnakeViz in this document...
+    
+
+
+
+<iframe id='snakeviz-ce7f3a38-e97e-11ec-adf5-b9b3c6c2d326' frameborder=0 seamless width='100%' height='1000'></iframe>
+<script>document.getElementById("snakeviz-ce7f3a38-e97e-11ec-adf5-b9b3c6c2d326").setAttribute("src", "http://" + document.location.hostname + ":8080/snakeviz/C%3A%5CUsers%5Ctobia%5CAppData%5CLocal%5CTemp%5Ctmplfvoqgdt")</script>
+
+
+
+
+```python
+%%snakeviz
+
+get_similar_job_posts(sample, post, title_w=2.0, category_w=1.0, type_w=0.0, pos_w=0.0, printing=False, show_progress=False)
+```
+
+     
+    *** Profile stats marshalled to file 'C:\\Users\\tobia\\AppData\\Local\\Temp\\tmpbzuv2m2m'.
+    Embedding SnakeViz in this document...
+    
+
+
+
+<iframe id='snakeviz-e1189dcf-e97e-11ec-8087-b9b3c6c2d326' frameborder=0 seamless width='100%' height='1000'></iframe>
+<script>document.getElementById("snakeviz-e1189dcf-e97e-11ec-8087-b9b3c6c2d326").setAttribute("src", "http://" + document.location.hostname + ":8080/snakeviz/C%3A%5CUsers%5Ctobia%5CAppData%5CLocal%5CTemp%5Ctmpbzuv2m2m")</script>
+
+
+
+**Erbegnis:**
+
+<img src="./profiling.png" width="500px">
+<img src="./profiling_category.png" width="500px">
+
+Auffällig ist die Laufzeit der Berechnung der Kategorie, wobei dort viel Laufzeit in das bestimmen des Hauptworts steckt (ca. 6 Sekunden).<br>
+Wie viel Zeit das Weglassen dieses Prozesses bringt muss noch extern evaluiert werden. <br>
+<br>
+Sonst konnte ich keine weitere Auffäligkeit finden.
+
+---
+
+### Location Runtime Test
+[<img src="./rackete_1.png" style="float:right" width=100></img>](#Table-of-Content)
+
+In diesem Abschnitt wird die Laufzeit der Location getestet. Im Experiment 11 wurde schon evaluiert, dass das Berechnen der Location etwa je nach Datengröße bis zu 99% einnehmen kann. Hier soll noch einmal der Vergleich von der Ausführung der Anwendung ohne und mit getestet werden. Die Realität sieht ja meist anders aus, es wird trotzdem ein ähnliches Ergebnis erwartet.<br>
+Anders als bei dem Experiment 11 wird die gesamt Zeit gemessen. Im Experiment 11 wurde die Zeit ja einzeln gemessen und dieser Aspekt nicht im Detail. 
+
+
+```python
+data = pd.read_excel("../data_scientist_united_states_job_postings_jobspikr.xlsx")
+post = data.values.tolist()[33]
+result = ""
+```
+
+
+```python
+samples = data.sample(n=1000, replace=False)
+
+for i in [0.0, 1.0]:
+    start = time.time()
+    posts = get_similar_job_posts(samples, post, title_w=2.0, category_w=1.0, \
+                                                type_w=0.0, pos_w=i, printing=False, show_progress=False)
+    duration = time.time() - start
+
+    on = False
+    if i == 0:
+        on = True
+    
+    result += f"Location {on} -> {duration:.2f} seconds\n"
+result
+```
+
+    
+    WARNING: CALC LOCATION IS EXPENSIVE!
+    
+    
+
+
+
+
+    'Location True -> 24.40 secondsLocation False -> 1012.82 seconds'
+
+
+
+**Ergebnis:**
+
+Wie erwartet braucht die Anwendung beim gleichen Anwendungsfall mit gleichen Faktoren mit der Berechnung der Location ca. 41 mal länger als ohne die berechnung der Location.
+
+---
+
+### Trimmed Category Calc 
+[<img src="./rackete_1.png" style="float:right" width=100></img>](#Table-of-Content)
+
+Hier soll die Laufzeit inbezug auf das Berechnen der Kategorie gestestet werden. Bei einem Nan Wert, wird aus der Job-Description das häufigste Wort herausgesucht. Diese Option wird nun an und ausgeschalten unter der Beobachtung der Laufzeit. 
+
+
+```python
+def job_category_points(nlp, category1, category2, description1, description2):
+    # fix the category if it nothing
+    if type(category1) == float:
+        category1 = get_most_common_noun(description1, nlp)
+        
+    if type(category2) == float:
+        category2 = get_most_common_noun(description2, nlp)
+        
+    # build doc
+    doc1 = nlp(category1)
+    doc2 = nlp(category2)
+    
+    # calc similarity
+    sim = doc1.similarity(doc2)
+    
+    if sim >= 0.95:
+        return 5
+    elif sim >= 0.9:
+        return 3
+    elif sim >= 0.8:
+        return 1
+    else:
+        return 0
+```
+
+
+```python
+start = time.time()
+get_similar_job_posts(samples, post, title_w=2.0, category_w=1.0, \
+                                                type_w=0.0, pos_w=0.0, printing=False, show_progress=False)
+duration = time.time()-start 
+duration
+```
+
+
+
+
+    23.42689871788025
+
+
+
+
+```python
+def job_category_points(nlp, category1, category2, description1, description2):
+    # if the category is nothing = return 0
+    if type(category1) == float or type(category2) == float:
+        return 0
+        
+    # build doc
+    doc1 = nlp(category1)
+    doc2 = nlp(category2)
+    
+    # calc similarity
+    sim = doc1.similarity(doc2)
+    
+    if sim >= 0.95:
+        return 5
+    elif sim >= 0.9:
+        return 3
+    elif sim >= 0.8:
+        return 1
+    else:
+        return 0
+```
+
+
+```python
+start = time.time()
+get_similar_job_posts(samples, post, title_w=2.0, category_w=1.0, \
+                                                type_w=0.0, pos_w=0.0, printing=False, show_progress=False)
+duration = time.time()-start 
+duration
+```
+
+
+
+
+    17.844507217407227
+
+
+
+**Ergebnis:**
+
+Tatsächlich bringt das Weglassen der Berechnung des häufigsten Wortes bei keinem Wert ca. 6 Sekunden. Inwiefern sich das Ergebnis verschlechtert ist dabei unbekannt.
+
+So muss ich mich zwischen diesen beiden Varianten entscheiden. Ich vermute das die Genauigkeit sinkt, jedoch nicht so drastisch.
 
 ---
