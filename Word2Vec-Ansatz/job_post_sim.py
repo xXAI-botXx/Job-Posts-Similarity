@@ -99,7 +99,7 @@ def job_type_points(type1, type2):
 
 
 
-def job_location_points(city1, country1, city2, country2):
+def job_location_points(city1, country1, city2, country2, weight):
     # Initialize Nominatim API
     geolocator = Nominatim(user_agent="MyApp")
 
@@ -113,6 +113,9 @@ def job_location_points(city1, country1, city2, country2):
     pos2 = (location2.latitude, location2.longitude)
     
     sim = 1 / (geodesic(pos1, pos2).km+1)
+
+    if weight < 0:
+        sim = revert_sim(sim)
     
     if sim >= 0.1:
         return 5
@@ -160,7 +163,7 @@ def calc_points(job_posts:pd.DataFrame, job_post, progress, total, nlp, pruning,
         if pos_w != 0:
             print("WARNING: CALC LOCATION IS EXPENSIVE!")
             score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts.iloc[post_idx, 5], \
-                                           job_posts.iloc[post_idx, 7]) * pos_w
+                                           job_posts.iloc[post_idx, 7], weight) * abs(pos_w)
 
         progress[0] += 1
         progress_bar(progress[0], total)
@@ -229,7 +232,7 @@ def calc_points_parallel(result, job_posts:pd.DataFrame, job_post, progress, tot
         # points for job-location similarity  
         if pos_w != 0:
             score[post_idx] += job_location_points(job_post[5], job_post[7], job_posts['city'][post_idx+offset], \
-                                            job_posts['country'][post_idx+offset]) * pos_w
+                                            job_posts['country'][post_idx+offset], weight) * abs(pos_w)
 
         progress[0] += 1
         progress_bar(progress[0], total)
@@ -514,6 +517,10 @@ def time_experiment():
         with open("./time_experiment_reults.txt", "a") as file:
             file.write(results)
     
+
+def revert_sim(sim:float):
+    return round((sim*-1)+1.0, 2)
+
 
 def main():
     # load data
