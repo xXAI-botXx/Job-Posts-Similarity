@@ -544,7 +544,7 @@ def main():
     category_w = 1.0 if category_w == None else category_w
     type_w = get_float_number_input(f"How important is the type? Type a number between 0.0 and 3.0 or pass/enter", 0.0, 3.0)
     type_w = 0.0 if type_w == None else type_w
-    pos_w = get_float_number_input(f"How important is the location? Type a number between 0.0 and 3.0 or pass/enter", 0.0, 3.0)
+    pos_w = get_float_number_input(f"How important is the location? Type a number between -3.0 and 3.0 or pass/enter", -3.0, 3.0)
     pos_w = 0.0 if pos_w == None else pos_w
 
     # calc scores -> get similar job posts
