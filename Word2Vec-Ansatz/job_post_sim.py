@@ -77,21 +77,24 @@ def job_category_points(nlp, category1, category2, description1, description2):
 
 
 def job_type_points(type1, type2):
-    res = 0
-    if type1 == "Undefined" or type2 == "Undefined":
-        res = 0
-    elif type1 == type2:
-        res = 5
+    res = 0.0    
+
+    if type1 == type2:
+        res = 1.0
     elif (type1 == "Full Time" and type2 == "Contract") or (type2 == "Full Time" and type1 == "Contract"):
-        res = 0
+        res = 0.5
     elif (type1 == "Part Time" and type2 == "Full Time") or (type2 == "Part Time" and type1 == "Full Time"):
-        res = 2
+        res = 0.5
     elif (type1 == "Part Time" and type2 == "Internship") or (type2 == "Part Time" and type1 == "Internship"):
-        res = 1
+        res = 0.2
+    elif (type1 == "Part Time" and type2 == "Contract") or (type2 == "Part Time" and type1 == "Contract"):
+        res = 0.5
     elif (type1 == "Full Time" and type2 == "Internship") or (type2 == "Full Time" and type1 == "Internship"):
-        res = 0
+        res = 0.0
     elif (type1 == "Contract" and type2 == "Internship") or (type2 == "Contract" and type1 == "Internship"):
-        res = 0
+        res = 0.5
+    elif type1 == "Undefined" or type2 == "Undefined":
+        res = 0.1
     return res
 
 
